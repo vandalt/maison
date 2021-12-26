@@ -1,0 +1,352 @@
+# Default config for sway
+#
+# Copy this to ~/.config/sway/config and edit it to your liking.
+#
+# Read `man 5 sway` for a complete reference.
+
+### Variables
+#
+# Logo key.
+set $mod Mod4
+# Home row direction keys, like vim
+set $left h
+set $down j
+set $up k
+set $right l
+# Terminal
+set $term alacritty
+# App launchers ($menu is all commands and $appmneu is desktop menu)
+# Note: pass the final command to swaymsg so that the resulting window can be opened
+# on the original workspace that the command was run on.
+set $menu demnu_path | wofi -I --show run | xargs swaymsg exec --
+set $appmenu dmenu_path | wofi -I --show drun -i | xargs swaymsg exec --
+# Main laptop output, to map touchscreen and pen
+set $out1 eDP-1
+# Input devices
+set $touchpad "1739:52542:SYNA2B31:00_06CB:CD3E_Touchpad"
+set $finger "1386:20963:Wacom_HID_51E3_Finger"
+set $pen "1386:20963:Wacom_HID_51E3_Pen"
+# Background
+set $background /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png
+# Screen lock command, with same image as background (other options are in config file)
+set $lock swaylock -e --image $background
+# Browser
+set $browser firefox
+# Workspaces
+set $ws1  1
+set $ws2  2
+set $ws3  3
+set $ws4  4
+set $ws5  5
+set $ws6  6
+set $ws7  7
+set $ws8  8
+set $ws9  9
+set $ws10 10
+
+
+
+### Input configuration
+# You can get the names of your inputs by running: swaymsg -t get_inputs
+# Touchpad
+input $touchpad {
+    dwt enabled
+    tap enabled
+    natural_scroll enabled
+    middle_emulation enabled
+    accel_profile adaptive
+}
+# Keyboard
+input "type:keyboard" {
+    repeat_delay 250
+    xkb_layout "us,us"
+    # xkb_variant ",altgr-intl"
+    xkb_variant ",intl"
+    xkb_options "grp:alt_space_toggle,caps:swapescape,compose:ralt"
+}
+# Map touchscreen to output
+input $finger map_to_output $out1
+input $pen map_to_output $out1
+
+### Output configuration
+#
+# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
+output * bg $background fill
+
+### General behaviour
+#
+popup_during_fullscreen leave_fullscreen
+# Mouse stuff
+seat seat0 hide_cursor 3000
+focus_follows_mouse yes
+mouse_warping output
+# Borders
+default_border pixel 2
+default_floating_border normal 2
+hide_edge_borders smart
+smart_borders on
+smart_gaps on
+gaps inner 5
+
+# Floating windows
+for_window [app_id="pavucontrol"] floating enable
+for_window [app_id="gnome-font-viewer"] floating enable
+for_window [app_id="blueberry.py"] floating enable
+for_window [app_id="galculator"] floating enable
+for_window [app_id="gnome-calculator"] floating enable
+for_window [app_id="thunar"] floating enable
+for_window [app_id="imv"] floating enable
+for_window [app_id="zoom"] floating enable
+for_window [app_id="ipython" title="Figure .*"] floating enable
+for_window [app_id="python" title="Figure .*"] floating enable
+for_window [app_id="python3" title="Figure .*"] floating enable
+for_window [app_id="firefox" title="Sharing Indicator"] floating enable
+for_window [app_id="firefox" title="Library"] floating enable
+for_window [app_id="firefox" title="Picture-in-Picture"] floating enable
+for_window [app_id="org.kde.kdeconnect*"] floating enable
+for_window [class="jetbrains-pycharm" title="Welcome to PyCharm"] floating enable
+for_window [class="Matplotlib"] floating enable
+for_window [class="edu-stsci-apt-controller-APT" title="Open"] floating enable
+for_window [class="jetbrains-pycharm" title="win0"] floating enable
+for_window [class="uk-ac-starlink-topcat-Driver"] floating enable
+for_window [class="Ds9.tcl"] floating enable
+for_window [class="Toplevel"] floating enable
+
+
+### Key bindings
+#
+# Basics:
+#
+    # Start a terminal
+    bindsym $mod+Return exec $term
+
+    # Start web browser
+    bindsym $mod+i exec $browser
+
+    # Kill focused window
+    bindsym $mod+Shift+q kill
+
+    # Start your launcher
+    bindsym $mod+d exec $menu
+    bindsym $mod+Shift+d exec $appmenu
+
+    # Drag floating windows by holding down $mod and left mouse button.
+    # Resize them with right mouse button + $mod.
+    # Despite the name, also works for non-floating windows.
+    # Change normal to inverse to use left mouse button for resizing and right
+    # mouse button for dragging.
+    floating_modifier $mod normal
+
+    # Reload the configuration file
+    bindsym $mod+Shift+c reload
+
+    # Lock session
+    bindsym $mod+Backspace exec $lock
+
+    # Toggle waybar
+    bindsym $mod+Shift+i exec killall -SIGUSR1 waybar
+
+    # Exit sway (logs you out of your Wayland session)
+    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+#
+# Moving around:
+#
+    # Move your focus around
+    bindsym $mod+$left focus left
+    bindsym $mod+$down focus down
+    bindsym $mod+$up focus up
+    bindsym $mod+$right focus right
+    # Or use $mod+[up|down|left|right]
+    bindsym $mod+Left focus left
+    bindsym $mod+Down focus down
+    bindsym $mod+Up focus up
+    bindsym $mod+Right focus right
+
+    # Move the focused window with the same, but add Shift
+    bindsym $mod+Shift+$left move left
+    bindsym $mod+Shift+$down move down
+    bindsym $mod+Shift+$up move up
+    bindsym $mod+Shift+$right move right
+    # Ditto, with arrow keys
+    bindsym $mod+Shift+Left move left
+    bindsym $mod+Shift+Down move down
+    bindsym $mod+Shift+Up move up
+    bindsym $mod+Shift+Right move right
+#
+# Workspaces:
+#
+    # Switch to workspace
+    bindsym $mod+1 workspace $ws1
+    bindsym $mod+2 workspace $ws2
+    bindsym $mod+3 workspace $ws3
+    bindsym $mod+4 workspace $ws4
+    bindsym $mod+5 workspace $ws5
+    bindsym $mod+6 workspace $ws6
+    bindsym $mod+7 workspace $ws7
+    bindsym $mod+8 workspace $ws8
+    bindsym $mod+9 workspace $ws9
+    bindsym $mod+0 workspace $ws10
+    # Move focused container to workspace
+    bindsym $mod+Shift+1 move container to workspace $ws1
+    bindsym $mod+Shift+2 move container to workspace $ws2
+    bindsym $mod+Shift+3 move container to workspace $ws3
+    bindsym $mod+Shift+4 move container to workspace $ws4
+    bindsym $mod+Shift+5 move container to workspace $ws5
+    bindsym $mod+Shift+6 move container to workspace $ws6
+    bindsym $mod+Shift+7 move container to workspace $ws7
+    bindsym $mod+Shift+8 move container to workspace $ws8
+    bindsym $mod+Shift+9 move container to workspace $ws9
+    bindsym $mod+Shift+0 move container to workspace $ws10
+
+    # Move workspaces between outputs
+    bindsym $mod+bracketright move workspace to output right
+    bindsym $mod+bracketleft move workspace to output left
+    bindsym $mod+braceright move workspace to output up
+    bindsym $mod+braceleft move workspace to output down
+    # Toggle between two latest workspaces
+    bindsym $mod+Tab workspace back_and_forth
+
+    # Next and previous workspace
+    bindsym $mod+p exec swaymsg -t command workspace prev_on_output
+    bindsym $mod+n exec swaymsg -t command workspace next_on_output
+
+#
+# Layout stuff:
+#
+    # You can "split" the current object of your focus with
+    # $mod+b or $mod+v, for horizontal and vertical splits
+    # respectively.
+    bindsym $mod+minus splitv
+    bindsym $mod+backslash splith
+
+    # Switch the current container between different layout styles
+    bindsym $mod+s layout stacking
+    bindsym $mod+w layout tabbed
+    bindsym $mod+e layout toggle split
+
+    # Make the current focus fullscreen
+    bindsym $mod+Shift+f fullscreen
+
+    # Toggle the current focus between tiling and floating mode
+    bindsym $mod+Shift+space floating toggle
+
+    # Swap focus between the tiling area and the floating area
+    bindsym $mod+space focus mode_toggle
+
+    # Move focus to the parent container
+    bindsym $mod+a focus parent
+    bindsym $mod+c focus child
+#
+# Scratchpad:
+#
+    # Sway has a "scratchpad", which is a bag of holding for windows.
+    # You can send windows there and get them back later.
+
+    # Move the currently focused window to the scratchpad
+    bindsym $mod+Shift+equal move scratchpad
+
+    # Show the next scratchpad window or hide the focused scratchpad window.
+    # If there are multiple scratchpad windows, this command cycles through them.
+    bindsym $mod+equal scratchpad show
+#
+# System/media keys
+#
+    # Special keys
+    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+    bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+    bindsym --locked XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
+    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+    bindsym --locked XF86MonBrightnessUp exec brightnessctl set +5%
+    bindsym --locked XF86AudioPlay exec playerctl play-pause
+    bindsym --locked XF86AudioNext exec playerctl next
+    bindsym --locked XF86AudioPrev exec playerctl previous
+
+    # Alternative playerctl bindings
+    bindsym --locked $mod+Control+p exec playerctl play-pause
+    bindsym --locked $mod+Control+bracketright exec playerctl next
+    bindsym --locked $mod+Control+bracketleft exec playerctl previous
+#
+# Resizing containers:
+#
+mode "resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
+
+    # Ditto, with arrow keys
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+
+    # Return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+#
+# Moving containers:
+#
+mode "move" {
+    bindsym h move container to output left, workspace back_and_forth
+    bindsym j move container to output up, workspace back_and_forth
+    bindsym k move container to output down, workspace back_and_forth
+    bindsym l move container to output right, workspace back_and_forth
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+o mode "move"
+
+#
+# Execute program at startup
+#
+exec swayidle -w \
+    timeout 300 '$lock' \
+    timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+    before-sleep '$lock'
+exec udiskie
+
+#
+# Theming
+#
+#include /home/vandal/base16-sway/themes/base16-onedark.config
+
+# Basic color configuration using the Base16 variables for windows and borders.
+# Property Name         Border  BG      Text    Indicator Child Border
+#client.focused          $base05 $base0D $base00 $base0D $base0D
+#client.focused_inactive $base01 $base01 $base05 $base03 $base01
+#client.unfocused        $base01 $base00 $base05 $base01 $base01
+#client.urgent           $base08 $base08 $base00 $base08 $base08
+#client.placeholder      $base00 $base00 $base05 $base00 $base00
+#client.background       $base07
+
+#
+# Status Bar:
+#
+bar {
+    position top
+
+    swaybar_command waybar
+
+    #colors {
+    #    background $base00
+    #    separator  $base01
+    #    statusline $base04
+    #
+    #    # State             Border  BG      Text
+    #    focused_workspace   $base05 $base0D $base00
+    #    active_workspace    $base05 $base03 $base00
+    #    inactive_workspace  $base03 $base01 $base05
+    #    urgent_workspace    $base08 $base08 $base00
+    #    binding_mode        $base00 $base0A $base00
+    #}
+}
+
+include /etc/sway/config.d/*
