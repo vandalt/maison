@@ -3,6 +3,9 @@
 # make default editor Neovim
 export EDITOR=nvim
 
+eval $(gnome-keyring-daemon --start)
+export SSH_AUTH_SOCK
+
 # Most pure GTK3 apps use wayland by default, but some,
 # like Firefox, need the backend to be explicitely selected.
 export MOZ_ENABLE_WAYLAND=1
