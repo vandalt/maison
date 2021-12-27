@@ -1,3 +1,3 @@
 #!/usr/bin/bash
 
-stow -vRt ~ shell sway waybar defaults alacritty kitty
+stow -vRt ~ shell sway waybar mako defaults alacritty kitty applications libinput-gestures nvim
