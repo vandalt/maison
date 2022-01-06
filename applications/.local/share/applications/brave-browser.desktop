@@ -107,7 +107,8 @@ Comment[zh_HK]=連線到網際網路
 Comment[zh_TW]=連線到網際網路
 StartupNotify=true
 StartupWMClass=brave-browser
-TryExec=brave --enable-features=UseOzonePlatform --ozone-platform=wayland
+# For some reason, changing tryexec makes the file undiscoverable....
+TryExec=brave
 Exec=brave --enable-features=UseOzonePlatform --ozone-platform=wayland %U
 Terminal=false
 Icon=brave-desktop
