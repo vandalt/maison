@@ -1,7 +1,5 @@
 # Default config for sway
 #
-# Copy this to ~/.config/sway/config and edit it to your liking.
-#
 # Read `man 5 sway` for a complete reference.
 
 ### Variables
@@ -15,6 +13,8 @@ set $up k
 set $right l
 # Terminal
 set $term alacritty
+# Bin with sway commands
+set $bin ~/.local/bin/sway
 # App launchers ($menu is all commands and $appmneu is desktop menu)
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
@@ -27,11 +27,18 @@ set $touchpad "1739:52542:SYNA2B31:00_06CB:CD3E_Touchpad"
 set $finger "1386:20963:Wacom_HID_51E3_Finger"
 set $pen "1386:20963:Wacom_HID_51E3_Pen"
 # Background
-set $background /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png
+# set $background /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png
+set $background ~/Pictures/sapins.jpg
 # Screen lock command, with same image as background (other options are in config file)
-set $lock swaylock -e --image $background
+set $lock swaylock -i $background
 # Browser
 set $browser firefox
+set $browser2 qutebrowser
+# Screenshot commands
+set $screenshot grim ~/Pictures/Screenshot-$(date +"%Y-%m-%d-%H-%M-%S").png
+set $areashot slurp | grim -g - ~/Pictures/Screenshot-$(date +"%Y-%m-%d-%H-%M-%S").png
+set $screenclip grim - | wl-copy
+set $areaclip slurp | grim  -g - - | wl-copy
 # Workspaces
 set $ws1  1
 set $ws2  2
@@ -43,9 +50,18 @@ set $ws7  7
 set $ws8  8
 set $ws9  9
 set $ws10 10
-
-
-
+# Theme
+include ~/.config/sway/themes/base16-gruvbox-dark-medium.config
+set $background-color $base00
+set $accent-color $base0D
+set $text-color $base06
+# Bar (requires base16 colors)
+set $onscreen_bar bash $bin/mywob "$accent-colorFF" "$background-colorFF" 
+# Pulseaudio get-volume
+set $sink_volume pactl get-sink-volume @DEFAULT_SINK@ | grep '^Volume:' | cut -d / -f 2 | tr -d ' ' | sed 's/%//'
+set $source_volume pactl get-source-volume @DEFAULT_SOURCE@ | grep '^Volume:' | cut -d / -f 2 | tr -d ' ' | sed 's/%//'
+# Notifications
+set $notifications mako --text-color "$text-color" --border-color "$accent-color" --background-color "$background-color"
 ### Input configuration
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Touchpad
@@ -103,6 +119,7 @@ for_window [app_id="python3" title="Figure .*"] floating enable
 for_window [app_id="firefox" title="Sharing Indicator"] floating enable
 for_window [app_id="firefox" title="Library"] floating enable
 for_window [app_id="firefox" title="Picture-in-Picture"] floating enable
+for_window [app_id="org.gnome.Solanum"] floating enable
 for_window [app_id="org.kde.kdeconnect*"] floating enable
 for_window [class="jetbrains-pycharm" title="Welcome to PyCharm"] floating enable
 for_window [class="Matplotlib"] floating enable
@@ -122,6 +139,7 @@ for_window [class="Toplevel"] floating enable
 
     # Start web browser
     bindsym $mod+i exec $browser
+    bindsym $mod+Shift+i exec $browser2
 
     # Kill focused window
     bindsym $mod+Shift+q kill
@@ -144,11 +162,8 @@ for_window [class="Toplevel"] floating enable
     bindsym $mod+Backspace exec $lock
 
     # Toggle waybar
-    bindsym $mod+Shift+i exec killall -SIGUSR1 waybar
+    bindsym $mod+Shift+b exec killall -SIGUSR1 waybar
 
-    # Exit sway (logs you out of your Wayland session)
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
-#
 # Moving around:
 #
     # Move your focus around
@@ -252,12 +267,12 @@ for_window [class="Toplevel"] floating enable
 # System/media keys
 #
     # Special keys
-    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
-    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
-    bindsym --locked XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
-    bindsym --locked XF86AudioMicMute exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
-    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
-    bindsym --locked XF86MonBrightnessUp exec brightnessctl set +5%
+    bindsym --locked XF86AudioRaiseVolume exec $onscreen_bar $(pactl set-sink-volume @DEFAULT_SINK@ +5% && $sink_volume)
+    bindsym --locked XF86AudioLowerVolume exec $onscreen_bar $(pactl set-sink-volume @DEFAULT_SINK@ -5% && $sink_volume)
+    bindsym --locked XF86AudioMute exec $onscreen_bar $(pactl set-sink-mute @DEFAULT_SINK@ toggle && pactl get-sink-mute @DEFAULT_SINK@ | sed -En "/no/ s/.*/$($sink_volume)/p; /yes/ s/.*/0/p")
+    bindsym --locked XF86AudioMicMute exec $onscreen_bar $(pactl set-source-mute @DEFAULT_SOURCE@ toggle && pactl get-source-mute @DEFAULT_SOURCE@ | sed -En "/no/ s/.*/$($source_volume)/p; /yes/ s/.*/0/p")
+    bindsym --locked XF86MonBrightnessDown exec $onscreen_bar $(brightnessctl set 5%- | sed -En 's/.*\(([0-9]+)%\).*/\1/p')
+    bindsym --locked XF86MonBrightnessUp exec $onscreen_bar $(brightnessctl set +5% | sed -En 's/.*\(([0-9]+)%\).*/\1/p')
     bindsym --locked XF86AudioPlay exec playerctl play-pause
     bindsym --locked XF86AudioNext exec playerctl next
     bindsym --locked XF86AudioPrev exec playerctl previous
@@ -267,9 +282,27 @@ for_window [class="Toplevel"] floating enable
     bindsym --locked $mod+Control+bracketright exec playerctl next
     bindsym --locked $mod+Control+bracketleft exec playerctl previous
 #
+# Screenshot
+#
+    # Full screen
+    bindsym --release Print exec $screenshot
+
+    # Area
+    bindsym --release Shift+Print exec $areashot
+
+    # Full screen to clipboard
+    bindsym --release Control+Print exec $screenclip
+
+    # Area to clipboard
+    bindsym --release Control+Shift+Print exec $areaclip
+#
 # Resizing containers:
 #
-mode "resize" {
+set $mode_resize "<span foreground='$base0A'></span>  \
+<span foreground='$base05'><b>Resize</b></span> <span foreground='$base0A'>(<b>↑ ↓ ← →</b>)</span> \
+<span foreground='$base05'><b>Increase Gaps</b></span> <span foreground='$base0A'>(<b>+</b>)</span> \
+<span foreground='$base05'><b>Decrease Gaps</b></span> <span foreground='$base0A'>(<b>-</b>)</span>"
+mode --pango_markup $mode_resize {
     # left will shrink the containers width
     # right will grow the containers width
     # up will shrink the containers height
@@ -289,7 +322,40 @@ mode "resize" {
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
-bindsym $mod+r mode "resize"
+bindsym $mod+r mode $mode_resize
+#
+# Shutdown/logout
+set $mode_shutdown "\
+<span foreground='$base0A'></span>  \
+<span foreground='$base05'> \
+<span foreground='$base0A'>(<b>l</b>)</span>lock \
+<span foreground='$base0A'>(<b>e</b>)</span>logout \
+<span foreground='$base0A'>(<b>r</b>)</span>reboot \
+<span foreground='$base0A'>(<b>u</b>)</span>suspend \
+<span foreground='$base0A'>(<b>s</b>)</span>shutdown \
+</span>"
+set $purge_cliphist [ $purge_cliphist_logout == 'true' ] && rm -f $HOME/.cache/cliphist/db || exit 0
+mode --pango_markup $mode_shutdown {
+    # lock
+    bindsym l mode "default", exec $lock
+
+    # logout
+    bindsym e exec $purge_cliphist; exec loginctl terminate-user $USER
+
+    # suspend
+    bindsym u mode "default", exec systemctl suspend
+
+    # shutdown
+    bindsym s exec $purge_cliphist; exec systemctl poweroff
+
+    # reboot
+    bindsym r exec $purge_cliphist; exec systemctl reboot
+
+    # Return to default mode.
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+}
+bindsym $mod+Shift+e mode $mode_shutdown
 #
 # Moving containers:
 #
@@ -312,20 +378,24 @@ exec swayidle -w \
     timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
     before-sleep '$lock'
 exec udiskie
+exec gammastep
+exec libinput-gestures
+exec $notifications
+exec_always "pkill kanshi; exec kanshi"
+
 
 #
 # Theming
 #
-#include /home/vandal/base16-sway/themes/base16-onedark.config
 
 # Basic color configuration using the Base16 variables for windows and borders.
 # Property Name         Border  BG      Text    Indicator Child Border
-#client.focused          $base05 $base0D $base00 $base0D $base0D
-#client.focused_inactive $base01 $base01 $base05 $base03 $base01
-#client.unfocused        $base01 $base00 $base05 $base01 $base01
-#client.urgent           $base08 $base08 $base00 $base08 $base08
-#client.placeholder      $base00 $base00 $base05 $base00 $base00
-#client.background       $base07
+client.focused          $base05 $base0D $base00 $base0D $base0D
+client.focused_inactive $base01 $base01 $base05 $base03 $base01
+client.unfocused        $base01 $base00 $base05 $base01 $base01
+client.urgent           $base08 $base08 $base00 $base08 $base08
+client.placeholder      $base00 $base00 $base05 $base00 $base00
+client.background       $base07
 
 #
 # Status Bar:
