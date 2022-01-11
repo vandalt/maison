@@ -382,6 +382,10 @@ exec gammastep
 exec libinput-gestures
 exec $notifications
 exec_always "pkill kanshi; exec kanshi"
+# Not sure the first line is needed.
+# Indiciator won't show at first, open phone then should connect and show up
+exec kdeconnect-cli -n "Pixel 4A"
+exec kdeconnect-indicator
 
 
 #
