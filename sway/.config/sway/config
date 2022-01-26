@@ -20,6 +20,7 @@ set $bin ~/.local/bin/sway
 # on the original workspace that the command was run on.
 set $menu demnu_path | wofi -I --show run | xargs swaymsg exec --
 set $appmenu dmenu_path | wofi -I --show drun -i | xargs swaymsg exec --
+set $passmenu $bin/rbw-wofi
 # Main laptop output, to map touchscreen and pen
 set $out1 eDP-1
 # Input devices
@@ -28,17 +29,20 @@ set $finger "1386:20963:Wacom_HID_51E3_Finger"
 set $pen "1386:20963:Wacom_HID_51E3_Pen"
 # Background
 # set $background /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png
-set $background ~/Pictures/sapins.jpg
+set $background ~/Pictures/aurores/snow.jpg
 # Screen lock command, with same image as background (other options are in config file)
 set $lock swaylock -i $background
 # Browser
 set $browser firefox
 set $browser2 qutebrowser
+set $mail $term --class neomutt --title Neomutt -e neomutt
+set $files $term --class nnn --title Files -e nnn
 # Screenshot commands
 set $screenshot grim ~/Pictures/Screenshot-$(date +"%Y-%m-%d-%H-%M-%S").png
 set $areashot slurp | grim -g - ~/Pictures/Screenshot-$(date +"%Y-%m-%d-%H-%M-%S").png
 set $screenclip grim - | wl-copy
 set $areaclip slurp | grim  -g - - | wl-copy
+set $colorpicker $bin/colorpicker
 # Workspaces
 set $ws1  1
 set $ws2  2
@@ -51,7 +55,7 @@ set $ws8  8
 set $ws9  9
 set $ws10 10
 # Theme
-include ~/.config/sway/themes/base16-gruvbox-dark-medium.config
+include ~/.config/sway/themes/base16-tokyonight.config
 set $background-color $base00
 set $accent-color $base0D
 set $text-color $base06
@@ -102,11 +106,12 @@ default_floating_border normal 2
 hide_edge_borders smart
 smart_borders on
 smart_gaps on
-gaps inner 5
+gaps inner 10
 
 # Floating windows
 for_window [app_id="pavucontrol"] floating enable
 for_window [app_id="gnome-font-viewer"] floating enable
+for_window [app_id="pulseUI"] floating enable
 for_window [app_id="blueberry.py"] floating enable
 for_window [app_id="galculator"] floating enable
 for_window [app_id="gnome-calculator"] floating enable
@@ -140,6 +145,14 @@ for_window [class="Toplevel"] floating enable
     # Start web browser
     bindsym $mod+i exec $browser
     bindsym $mod+Shift+i exec $browser2
+
+    bindsym $mod+Shift+p exec $passmenu
+
+    # Start email client
+    bindsym $mod+m exec $mail
+
+    # Start file browser
+    bindsym $mod+f exec $files
 
     # Kill focused window
     bindsym $mod+Shift+q kill
@@ -295,6 +308,8 @@ for_window [class="Toplevel"] floating enable
 
     # Area to clipboard
     bindsym --release Control+Shift+Print exec $areaclip
+
+    bindsym --release $mod+Control+p exec $colorpicker
 #
 # Resizing containers:
 #
@@ -400,6 +415,10 @@ client.unfocused        $base01 $base00 $base05 $base01 $base01
 client.urgent           $base08 $base08 $base00 $base08 $base08
 client.placeholder      $base00 $base00 $base05 $base00 $base00
 client.background       $base07
+# Taken from: https://github.com/koiosdev/Tokyo-Night-Linux/blob/master/.config/sway/config
+# client.focused           #9aa5ce #16161d #c0caf5 #9aa5ce   #9aa5ce
+# client.focused_inactive  #16161d #16161d #c0caf5 #16161d   #16161d
+# client.unfocused         #16161d #16161d #c0caf5 #16161d   #16161d
 
 #
 # Status Bar:

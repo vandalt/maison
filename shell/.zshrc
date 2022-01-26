@@ -61,6 +61,11 @@ alias buntar='tar -xjvf'
 alias open='xdg-open'
 alias ...="cd ../.."
 
+alias t='task'
+
+# Mutt
+alias mutt='neomutt'
+
 # Clone and update AUR in aur dir
 alias auracle='auracle -C ~/aur'
 
@@ -85,23 +90,29 @@ alias csway='nvim ~/.config/sway/config'
 alias zshrc='nvim ~/.zshrc'
 
 export THEANO_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
-export WEBBPSF_PATH=$HOME/Documents/jwst_data/webbpsf-data
+export WEBBPSF_PATH=$HOME/Documents/jwst/data/webbpsf-data
 
 # Kitty
 if [ $TERM = "xterm-kitty" ]; then
-    alias icat="kitty +kitten icat"
-    alias ssh="kitty +kitten ssh"
+  LIGHT_COLOR='tokyonight_day.conf'
+  DARK_COLOR='tokyonight_storm.conf'
+
+  alias tday="cp ~/.config/kitty/themes/$LIGHT_COLOR ~/.config/kitty/theme.conf"
+  alias tnight="cp ~/.config/kitty/themes/$DARK_COLOR ~/.config/kitty/theme.conf"
+
+  alias icat="kitty +kitten icat"
+  alias ssh="kitty +kitten ssh"
 fi
 
 
 # Alacritty colors
 if [ $TERM = "alacritty" ]; then
-  LIGHT_COLOR='gruvbox_light.yml'
-  DARK_COLOR='gruvbox_dark.yml'
+  LIGHT_COLOR='alacritty_tokyonight_day.yml'
+  DARK_COLOR='alacritty_tokyonight_storm.yml'
 
-  alias aday="alacritty-colorscheme apply $LIGHT_COLOR"
-  alias anight="alacritty-colorscheme apply $DARK_COLOR"
-  alias atoggle="alacritty-colorscheme toggle $LIGHT_COLOR $DARK_COLOR"
+  alias tday="alacritty-colorscheme apply $LIGHT_COLOR"
+  alias tnight="alacritty-colorscheme apply $DARK_COLOR"
+  alias ttoggle="alacritty-colorscheme toggle $LIGHT_COLOR $DARK_COLOR"
 fi
 
 setopt CORRECT_ALL

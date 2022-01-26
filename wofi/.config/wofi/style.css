@@ -1,0 +1,30 @@
+/* base16-wofi (https://sr.ht/~knezi/base16-wofi)
+ * Base16 wofi template by knezi
+ * Tokyonight scheme */
+
+window {
+	background-color: #24283b;
+	color: #c0caf5;
+}
+
+#entry:nth-child(odd) {
+	background-color: #24283b;
+}
+
+#entry:nth-child(even) {
+	background-color: #1f2335;
+}
+
+#entry:selected {
+	background-color: #292e42;
+}
+
+#input {
+	background-color: #1f2335;
+	color: #a9b1d6;
+	border-color: #292e42; 
+}
+
+#input:focus {
+	border-color: #e0af68; 
+}

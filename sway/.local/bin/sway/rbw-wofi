@@ -1,0 +1,9 @@
+#!/bin/bash
+set -eu
+set -o pipefail
+
+if ! rbw unlocked &> /dev/null; then
+  rbw unlock
+fi
+
+rbw ls --fields folder,name,user | sed 's/\t/\//g' | sort | wofi --dmenu | sed 's/^[^\/]*\///' | sed 's/\// /' | xargs -r rbw get | wl-copy

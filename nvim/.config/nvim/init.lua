@@ -32,6 +32,19 @@ require('packer').startup(function()
 
   use 'neovim/nvim-lspconfig'
 
+  use 'mickael-menu/zk-nvim'
+  use 'ekickx/clipboard-image.nvim'
+
+  use 'hrsh7th/cmp-nvim-lsp'
+  use 'saadparwaiz1/cmp_luasnip'
+  use 'L3MON4D3/LuaSnip'
+  use 'rafamadriz/friendly-snippets'
+  use 'hrsh7th/nvim-cmp'
+
+  use {'kkoomen/vim-doge', run = ':call doge#install()'}  -- Auto-generate docstring
+
+  use 'windwp/nvim-autopairs'
+
   use {
     'nvim-telescope/telescope.nvim',
     requires = {
@@ -48,7 +61,13 @@ require('packer').startup(function()
 
   -- Color scheme
   use {"ellisonleao/gruvbox.nvim", requires = {"rktjmp/lush.nvim"}}
+  use 'folke/tokyonight.nvim'
   use 'shaunsingh/nord.nvim'
+
+  use {
+    'glacambre/firenvim',
+    run = function() vim.fn['firenvim#install'](0) end 
+  }
 
 end)
 
@@ -119,9 +138,9 @@ vim.api.nvim_exec([[
 
 -- Colors
 vim.cmd [[syntax enable]]
-vim.g.gruvbox_italic = 1
+-- vim.g.gruvbox_italic = 1
 vim.o.termguicolors = true
-vim.cmd [[colorscheme gruvbox]]
+vim.cmd [[colorscheme tokyonight]]
 
 -- Function with a few defaults to write prose (Global so can call in editor)
 function Prose(bufnr)
@@ -209,6 +228,10 @@ vim.api.nvim_set_keymap('n', '<leader>pc', ':PackerCompile<CR>', {noremap = true
 vim.api.nvim_set_keymap('n', '<leader>pl', ':PackerClean<CR>', {noremap = true})
 
 
+---- Add additional capabilities supported by nvim-cmp
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+
 
 -- LSP settings
 local lspconfig = require 'lspconfig'
@@ -258,7 +281,7 @@ table.insert(runtime_path, 'lua/?.lua')
 table.insert(runtime_path, 'lua/?/init.lua')
 
 -- List of all servers
-local servers = {'sumneko_lua', 'pyright', 'bashls', 'yamlls'}
+local servers = {'sumneko_lua', 'pyright', 'bashls', 'yamlls', "cssls"}
 -- Table with custom settings when required
 local lsp_settings = {
   bashls = {
@@ -276,10 +299,12 @@ local lsp_settings = {
       }
     }
   },
+  cssls = {
+    cmd = {"vscode-css-languageserver", "--stdio"},
+  },
   sumneko_lua = {
     -- Full cmd when installed from Arch repos
     cmd = {"lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua"},
-    on_attach = on_attach,
     settings = {
       Lua = {
         runtime = {
@@ -315,8 +340,8 @@ local function tbl_merge(...)
   end
   return new_tbl
 end
--- Setup with or without custom settings
-local common_tbl = {on_attach=on_attach}
+-- Setup with or without custom settings and with capabilities for nvim-cmp
+local common_tbl = {on_attach=on_attach, capabilities=capabilities}
 for _, lsp in ipairs(servers) do
   if lsp_settings[lsp] then
     lspconfig[lsp].setup(tbl_merge(common_tbl, lsp_settings[lsp]))
@@ -325,10 +350,67 @@ for _, lsp in ipairs(servers) do
   end
 end
 
+
+require("zk").setup {
+  -- can be "telescope", "fzf" or "select" (`vim.ui.select`)
+  -- it's recommended to use "telescope" or "fzf"
+  picker = "telescope",
+
+  lsp = {
+    -- `config` is passed to `vim.lsp.start_client(config)`
+    config = {
+      cmd = { "zk", "lsp" },
+      name = "zk",
+      on_attach = on_attach,
+      capabilities=capabilities,
+      -- etc, see `:h vim.lsp.start_client()`
+    },
+
+    -- automatically attach buffers in a zk notebook that match the given filetypes
+    auto_attach = {
+      enabled = true,
+      filetypes = { "markdown" },
+    },
+  },
+}
+
+local zk_opts = { noremap=true, silent=false }
+-- Create a new note after asking for its title.
+vim.api.nvim_set_keymap("n", "<leader>zn", "<Cmd>ZkNew { title = vim.fn.input('Title: ') }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zd", "<Cmd>ZkNew { title = vim.fn.input('Title: '), dir = vim.fn.input('Dir: ') }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zj", "<Cmd>ZkNew { dir = 'journal' }<CR>", zk_opts)
+-- Open notes.
+vim.api.nvim_set_keymap("n", "<leader>zo", "<Cmd>ZkNotes<CR>", zk_opts)
+-- Open notes associated with the selected tags.
+vim.api.nvim_set_keymap("n", "<leader>zt", "<Cmd>ZkTags<CR>", zk_opts)
+-- Search for the notes matching a given query.
+vim.api.nvim_set_keymap("n", "<leader>zf", "<Cmd>ZkNotes { match = vim.fn.input('Search: ') }<CR>", zk_opts)
+-- Search links
+vim.api.nvim_set_keymap("n", "<leader>zl", "<Cmd>ZkLinks<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zb", "<Cmd>ZkBacklinks<CR>", zk_opts)
+-- Search for the notes matching the current visual selection.
+vim.api.nvim_set_keymap("v", "<leader>zf", ":'<,'>ZkMatch<CR>", zk_opts)
+vim.api.nvim_set_keymap("v", "<leader>zn", ":'<,'>ZkNewFromTitleSelection<CR>", zk_opts)
+
+local parser_configs = require "nvim-treesitter.parsers".get_parser_configs()
+parser_configs.org = {
+  install_info = {
+    url = 'https://github.com/milisims/tree-sitter-org',
+    revision = 'f110024d539e676f25b72b7c80b0fd43c34264ef',
+    files = {'src/parser.c', 'src/scanner.cc'},
+  },
+  filetype = 'org',
+}
+
+
 -- Treesitter config
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "maintained",
-  highlight = { enable = true },
+  highlight = {
+    enable = true,
+    disable = {'org'}, -- Remove this to use TS highlighter for some of the highlights (Experimental)
+    additional_vim_regex_highlighting = {'org'}, -- Required since TS highlighter doesn't support all syntax features (conceal)
+  },
   incremental_selection = {
     enable = true,
     keymaps = {
@@ -389,11 +471,83 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
+-- LuaSnip setup
+local luasnip = require 'luasnip'
+require("luasnip.loaders.from_vscode").load()
+
+-- nvim-cmp setup
+local cmp = require 'cmp'
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end,
+  },
+  mapping = {
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.close(),
+    ['<CR>'] = cmp.mapping.confirm {
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = true,
+    },
+    ['<Tab>'] = function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end,
+    ['<S-Tab>'] = function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end,
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+  },
+}
+
+-- Doge mapping
+vim.g.doge_mapping = '<leader>ld'
+-- python docstring types
+vim.g.doge_doc_standard_python = 'sphinx'
+
+
+-- If you want insert `(` after select function or method item
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+cmp.event:on(
+  'confirm_done',
+  cmp_autopairs.on_confirm_done({  map_char = { tex = '' } })
+)
+
+-- add a lisp filetype (wrap my-function), FYI: Hardcoded = { "clojure", "clojurescript", "fennel", "janet" }
+cmp_autopairs.lisp[#cmp_autopairs.lisp+1] = "racket"
+
+-- put this to setup function and press <a-e> to use fast_wrap
+local npairs = require('nvim-autopairs')
+npairs.setup({
+    fast_wrap = {},
+})
+
+
+
 -- Use %% cells for jupytext
 vim.g.jupytext_fmt = 'py:percent'
 
-tterm = require('toggleterm')
-tterm.setup{
+
+require('toggleterm').setup{
   open_mapping = [[<A-\>]],
   start_in_insert = true,
 }
@@ -412,7 +566,7 @@ vim.api.nvim_set_keymap('n', '<leader>pr', ":lua RunPyFile()<CR>", {noremap = tr
 
 -- Setup nvim-ipy
 -- Gruvbox dark has dark text on dark background, so using light
-vim.cmd [[ command! -nargs=0 RunQtConsole call jobstart("jupyter qtconsole --JupyterWidget.include_other_output=True --style gruvbox-light") ]]
+vim.cmd [[ command! -nargs=0 RunQtConsole call jobstart("jupyter qtconsole --JupyterWidget.include_other_output=True") ]]
 function SetupKernel()
   vim.cmd [[ RunQtConsole ]]
   -- TODO: Make work with windows
@@ -430,6 +584,9 @@ vim.api.nvim_set_keymap('n', '<leader>rr', '<Plug>(IPy-Run)', {silent = true})
 vim.api.nvim_set_keymap('n', '<leader>ra', '<Plug>(IPy-RunAll)', {silent = true})
 vim.api.nvim_set_keymap('n', '<leader>ro', '<Plug>(IPy-RunOp)', {silent = true})
 
+-- Firenvim (off by default, use shortcut to set for FF addon to activate)
+vim.opt.guifont = 'DejaVu\\ Sans\\ Mono:h18'
+vim.g.firenvim_config = { localSettings = { ['.*'] = { takeover = 'never' } } }
 
 -- Telescope extensions
 local telescope = require('telescope')
