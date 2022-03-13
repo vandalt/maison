@@ -4,77 +4,192 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   vim.api.nvim_command('!git clone https://github.com/wbthomason/packer.nvim '..install_path)
 end
 
+--Remap space as leader key
+vim.api.nvim_set_keymap('', '<Space>', '<Nop>', { noremap = true, silent=true})
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 -- Packadd is there because making optional below
 vim.cmd [[packadd packer.nvim]]
 local use = require('packer').use
 require('packer').startup(function()
-
-  -- Inception - Load packer with packer
+  -- TODO: Github with linker and octo
   use {'wbthomason/packer.nvim', opt = true}
-
-  use 'tpope/vim-surround'  -- mappings to surround text objects
-  use 'tpope/vim-commentary'  -- map gc/gcc to comment
-  use 'tpope/vim-repeat'  -- repeat some plugin maps with '.'
-  use 'tpope/vim-fugitive'  -- git commands
+  use 'tpope/vim-surround'
+  use 'tpope/vim-repeat'
+  use {
+    'ruifm/gitlinker.nvim',
+    requires = 'nvim-lua/plenary.nvim',
+    config = function()
+      require('gitlinker').setup()
+    end
+  }
+  -- use 'tpope/vim-fugitive'
+  use 'sindrets/diffview.nvim'
+  use { 'TimUntersberger/neogit',
+    requires = {'nvim-lua/plenary.nvim', 'sindrets/diffview.nvim'},
+    config = function()
+      require('neogit').setup {
+        kind = "split_above",
+        integrations = { diffview = true }
+      }
+    end
+  }
+  use 'tpope/vim-rhubarb'
+ if vim.fn.executable "gh" == 1 then
+    use {
+      'pwntester/octo.nvim',
+      requires = {
+        'nvim-lua/plenary.nvim',
+        'nvim-telescope/telescope.nvim',
+        'kyazdani42/nvim-web-devicons',
+      },
+      config = function()
+        require('octo').setup()
+      end
+    }
+  end
   use 'tpope/vim-eunuch'  -- Enhanced unix shell commands
-  use 'tpope/vim-unimpaired'  -- "Paired" commands with '[' and ']'
-  use 'tpope/vim-sleuth'  -- Heuristically set indentation
+  use 'tpope/vim-sleuth'  -- heuristically set indentation
   use 'tpope/vim-vinegar'  -- nicer file navigation
-  use 'szw/vim-maximizer'  -- Maximize splits
-
+  use 'axelf4/vim-strip-trailing-whitespace' -- Remove white spaces only on modified lines
+  use 'szw/vim-maximizer'
+  use "AndrewRadev/splitjoin.vim"  -- Join and split lines with gS/gJ
   use 'justinmk/vim-gtfo'  -- Go to terminal (got) or file manager (gof)
-  use 'christoomey/vim-tmux-navigator'  -- Navigate vim and tmux with same bindings
+  use 'christoomey/vim-tmux-navigator'
   use 'tommcdo/vim-exchange'  -- Exchange text objects with cx/cxx
   use 'vim-scripts/ReplaceWithRegister'  -- Replace text object with gr
+  use 'KenN7/vim-arsync'  -- Sync remote files with rsync
+  use {
+    'nvim-lualine/lualine.nvim',
+    requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+  }
+  use {
+    'lewis6991/gitsigns.nvim',
+    requires = {
+      'nvim-lua/plenary.nvim'
+    },
+    config = function()
+      require('gitsigns').setup {
+        signs = {
+          -- Had trouble seeing color difference with lines for change and add
+          add = { text = "+" },
+        },
+        on_attach = function(bufnr)
+          local gs = package.loaded.gitsigns
 
+          local function map(mode, l, r, opts)
+            opts = opts or {}
+            opts.buffer = bufnr
+            vim.keymap.set(mode, l, r, opts)
+          end
+
+          -- Navigation
+          map('n', ']c', "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'", {expr=true})
+          map('n', '[c', "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'", {expr=true})
+
+          -- Actions
+          map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
+          map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
+          map('n', '<leader>hS', gs.stage_buffer)
+          map('n', '<leader>hu', gs.undo_stage_hunk)
+          map('n', '<leader>hR', gs.reset_buffer)
+          map('n', '<leader>hp', gs.preview_hunk)
+          map('n', '<leader>hb', function() gs.blame_line{full=true} end)
+          map('n', '<leader>tb', gs.toggle_current_line_blame)
+          map('n', '<leader>hd', gs.diffthis)
+          map('n', '<leader>hD', function() gs.diffthis('~') end)
+          map('n', '<leader>td', gs.toggle_deleted)
+
+          -- Text object
+          map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+        end
+        }
+    end,
+  }
+  use {
+    'numToStr/Comment.nvim',
+    config = function()
+      require('Comment').setup()
+    end,
+  }
+  use {
+    "folke/todo-comments.nvim",
+    requires = "nvim-lua/plenary.nvim",
+    config = function()
+      require("todo-comments").setup {
+        keywords = {
+          -- TODO: See if can get this to work with "???" as alt
+          -- https://github.com/folke/todo-comments.nvim/issues/56
+          QUESTION = {
+            icon = " ",
+            color = "info",
+          },
+        },
+      }
+    end,
+  }
+  use {
+    "folke/which-key.nvim",
+    config = function()
+      require("which-key").setup()
+    end,
+  }
+  -- NOTE: For some reason, un-installing which-key made gitsigns mappings work
+  use {
+    "folke/trouble.nvim",
+    requires = "kyazdani42/nvim-web-devicons",
+    config = function()
+      require("trouble").setup()
+    end
+  }
   use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
   use 'nvim-treesitter/nvim-treesitter-textobjects'
-
   use 'neovim/nvim-lspconfig'
-
+  use {
+    'j-hui/fidget.nvim',
+    config = function()
+      require("fidget").setup()
+    end
+  }
+  use 'mfussenegger/nvim-dap'
+  use {'jose-elias-alvarez/null-ls.nvim', requires = 'nvim-lua/plenary.nvim'}
+  use {'theHamsta/nvim-dap-virtual-text', requires = 'mfussenegger/nvim-dap'}
   use 'mickael-menu/zk-nvim'
   use 'ekickx/clipboard-image.nvim'
-
   use 'hrsh7th/cmp-nvim-lsp'
   use 'saadparwaiz1/cmp_luasnip'
   use 'L3MON4D3/LuaSnip'
   use 'rafamadriz/friendly-snippets'
   use 'hrsh7th/nvim-cmp'
-
   use {'kkoomen/vim-doge', run = ':call doge#install()'}  -- Auto-generate docstring
-
   use 'windwp/nvim-autopairs'
-
   use {
     'nvim-telescope/telescope.nvim',
     requires = {
       'nvim-lua/popup.nvim',
       'nvim-lua/plenary.nvim',
       'nvim-telescope/telescope-fzy-native.nvim',
+      'nvim-telescope/telescope-symbols.nvim',
       'nvim-telescope/telescope-z.nvim',
+      'nvim-telescope/telescope-dap.nvim',
     }
   }
-
   use 'goerz/jupytext.vim'  -- Convert and open jupyter notebooks
   use {'bfredl/nvim-ipy', run = ':UpdateRemotePlugins'}
+  use 'hkupty/iron.nvim'
+  use {'GCBallesteros/vim-textobj-hydrogen', requires = 'kana/vim-textobj-user'}
   use 'akinsho/nvim-toggleterm.lua'
-
-  -- Color scheme
-  use {"ellisonleao/gruvbox.nvim", requires = {"rktjmp/lush.nvim"}}
   use 'folke/tokyonight.nvim'
-  use 'shaunsingh/nord.nvim'
-
   use {
     'glacambre/firenvim',
-    run = function() vim.fn['firenvim#install'](0) end 
+    run = function() vim.fn['firenvim#install'](0) end
   }
-
 end)
 
 -- Window options
 vim.o.mouse = "a"
 vim.wo.list = true
-vim.o.title = true
 vim.o.shortmess = vim.o.shortmess.."c"
 vim.o.hidden = true
 vim.o.clipboard = "unnamedplus"
@@ -83,6 +198,7 @@ vim.o.clipboard = "unnamedplus"
 vim.o.backup = false
 vim.o.writebackup = false
 vim.o.updatetime = 300
+vim.o.undofile = true
 
 -- Search
 vim.o.ignorecase = true
@@ -95,29 +211,20 @@ vim.wo.relativenumber = true
 -- Color column at 80, 89
 vim.wo.colorcolumn = "80,89"
 
+-- Built-in completion
 vim.o.completeopt = "menuone,noselect"
 
 -- Enable filetype plugin
 vim.cmd [[filetype plugin on]]
 
--- Indendation
--- -- TODO: Remove when installing vim-sleuth, maybe
--- vim.cmd [[autocmd Filetype cpp setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2]]
--- vim.cmd [[autocmd Filetype lua setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2]]
--- vim.cmd [[autocmd Filetype python setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4]]
--- vim.cmd [[autocmd Filetype markdown setlocal expandtab tabstop=2 shiftwidth=2 softtabstop=2]]
--- vim.cmd [[autocmd BufNewFile, BufRead *.ipynb setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4]]
-
--- Remove trailing spaces
--- TODO: find way to do this only on lines I edited
--- (and that keeps cursor at current location)
--- vim.cmd [[autocmd BufWritePre * :%s/\s\+$//e]]
+-- Remove trailing spaces on whole file
+vim.api.nvim_set_keymap('n', '<leader>cw', '<Cmd>%s/\\s\\+$//e|norm!``<CR>', { noremap = true, silent = true })
 
 -- Completion in wildmode
 -- Commenting out fits because I often need to auto-complete them in scripts
 local wignorelist = {
   '.git', '.svn',
-  '*.jpg', '*.bmp', '*.gif', '*.png', '*.jpeg', '*.mp3',
+  -- '*.jpg', '*.bmp', '*.gif', '*.png', '*.jpeg', '*.mp3',
   '*.pyc', '*.o', '*.so', '*.out',
   '*.hdf5',
 --  '*.fits', '*.pdf'
@@ -144,7 +251,13 @@ vim.cmd [[colorscheme tokyonight]]
 
 -- Function with a few defaults to write prose (Global so can call in editor)
 function Prose(bufnr)
-  local function map(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+
+  local function map(mode, l, r, opts)
+    opts = opts or {}
+    opts.buffer = bufnr
+    vim.keymap.set(mode, l, r, opts)
+  end
+
   map('n', '<leader>ap', 'vasgq', {noremap = true})  -- Line to paragraph
   map('n', '<leader>al', 'vipJ', {noremap = true})  -- Paragraph to line
   vim.bo.textwidth = 80
@@ -163,16 +276,11 @@ function Prose(bufnr)
   map('v', 'j', 'gj', {noremap = true})
   map('v', 'k', 'gk', {noremap = true})
 end
-vim.cmd [[autocmd FileType tex,plaintex lua Prose()]]
+-- vim.cmd [[autocmd FileType tex,plaintex lua Prose()]]
 vim.cmd [[autocmd BufNewFile,BufRead *.md lua Prose()]]
 
 
 -- Mappings
-
---Remap space as leader key
-vim.api.nvim_set_keymap('', '<Space>', '<Nop>', { noremap = true, silent=true})
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
 
 -- Tmux and vim navigation
 vim.g.tmux_navigator_no_mappings = true
@@ -249,7 +357,6 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  -- TODO: Uncomment when telescope is installed
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ls', [[<cmd>lua require('telescope.builtin').lsp_references()<cr>]], opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
@@ -259,11 +366,11 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>Q', '<cmd>lua vim.diagnostic.setqflist()<CR>', opts)
 
   if client.resolved_capabilities.document_formatting then
-    vim.api.nvim_buf_set_buf_set_keymap("n", "<leader>sf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+    vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>sf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
     vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
   end
   if client.resolved_capabilities.document_range_formatting then
-    vim.api.nvim_buf_set_buf_set_keymap("v", "<leader>sf", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
+    vim.api.nvim_buf_set_keymap(bufnr, "v", "<leader>sf", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
     FormatRange = function()
       local start_pos = vim.api.nvim_buf_get_mark(0, '<')
       local end_pos = vim.api.nvim_buf_get_mark(0, '>')
@@ -275,13 +382,33 @@ local on_attach = function(client, bufnr)
   end
 end
 
+
+local null_ls = require("null-ls")
+
+null_ls.setup {
+  sources = {
+    null_ls.builtins.formatting.black,
+    null_ls.builtins.formatting.isort,
+    null_ls.builtins.diagnostics.flake8,
+  },
+  on_attach=on_attach,
+}
+
+
 -- Make runtime files discoverable
 local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, 'lua/?.lua')
 table.insert(runtime_path, 'lua/?/init.lua')
 
 -- List of all servers
-local servers = {'sumneko_lua', 'pyright', 'bashls', 'yamlls', "cssls"}
+local servers = {
+  'sumneko_lua',
+  'pyright',
+  'bashls',
+  'yamlls',
+  "cssls",
+  "texlab",
+}
 -- Table with custom settings when required
 local lsp_settings = {
   bashls = {
@@ -304,7 +431,7 @@ local lsp_settings = {
   },
   sumneko_lua = {
     -- Full cmd when installed from Arch repos
-    cmd = {"lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua"},
+    cmd = {"/home/vandal/programs/lua-language-server/bin/lua-language-server", "-E", "/home/vandal/programs/lua-language-server/bin/main.lua"},
     settings = {
       Lua = {
         runtime = {
@@ -329,6 +456,23 @@ local lsp_settings = {
         },
       },
     },
+  },
+  texlab = {
+    settings = {
+      texlab = {
+        build = {
+          forwardSearchAfter = true,
+          onSave = true,
+          args = { "-pdf", "-pdflatex=xelatex", "-interaction=nonstopmode", "-synctex=1", "%f" },
+        },
+        forwardSearch = {
+          executable = "okular",
+          args = {"--unique", "file:%p#src:%l%f"},
+          -- executable =  "evince-synctex",
+          -- args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
+        }
+      }
+    }
   }
 }
 local function tbl_merge(...)
@@ -350,6 +494,26 @@ for _, lsp in ipairs(servers) do
   end
 end
 
+if vim.fn.exists(":TexlabBuild") then
+  vim.api.nvim_set_keymap("n", "<leader>tb", "<Cmd>TexlabBuild<CR>", {noremap = true, silent = false})
+  vim.api.nvim_set_keymap("n", "<leader>tf", "<Cmd>TexlabForward<CR>", {noremap = true, silent = false})
+end
+
+--Set statusbar
+require('lualine').setup {
+  options = {
+    icons_enabled = true,
+    -- theme = "tokyonight",
+    component_separators = '|',
+    section_separators = '',
+  },
+  sections = {
+    lualine_b = {'branch', 'filename', 'diagnostics'},
+    lualine_c = {function()
+      return vim.fn['nvim_treesitter#statusline'](90)
+    end},
+  },
+}
 
 require("zk").setup {
   -- can be "telescope", "fzf" or "select" (`vim.ui.select`)
@@ -420,7 +584,10 @@ require'nvim-treesitter.configs'.setup {
       node_decremental = "grm",
     },
   },
-  indent = { enable = true },
+  indent = {
+    enable = true,
+    disable = { "python" },
+  },
   -- From https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   textobjects = {
     select = {
@@ -519,6 +686,12 @@ cmp.setup {
   },
 }
 
+-- LSP mappings
+vim.keymap.set('n', '<leader>lr', ':LspRestart<CR>', { silent = true })
+vim.keymap.set('n', '<leader>li', ':LspInfo<CR>', { silent = true })
+vim.keymap.set('n', '<leader>ll', ':LspStart<CR>', { silent = true }) -- "launch"
+vim.keymap.set('n', '<leader>lt', ':LspStop<CR>', { silent = true })
+
 -- Doge mapping
 vim.g.doge_mapping = '<leader>ld'
 -- python docstring types
@@ -542,6 +715,62 @@ npairs.setup({
 })
 
 
+-- Debugger
+local dap = require('dap')
+dap.adapters.python = {
+  type = 'executable';
+  command = '/home/vandal/programs/debugpy/venv/bin/python';
+  args = { '-m', 'debugpy.adapter' };
+}
+dap.configurations.python = {
+  {
+    -- The first three options are required by nvim-dap
+    type = 'python'; -- the type here established the link to the adapter definition: `dap.adapters.python`
+    request = 'launch';
+    name = "Launch file";
+
+    -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
+
+    program = "${file}"; -- This configuration will launch the current file if used.
+    pythonPath = function()
+      local venv_path = os.getenv("VIRTUAL_ENV")
+      if venv_path then
+        return venv_path .. "/bin/python"
+      end
+      local cwd = vim.fn.getcwd()
+      if vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
+        return cwd .. '/venv/bin/python'
+      elseif vim.fn.executable(cwd .. '/.venv/bin/python') == 1 then
+        return cwd .. '/.venv/bin/python'
+      else
+        return '/usr/bin/python'
+      end
+    end;
+  },
+}
+require("nvim-dap-virtual-text").setup()
+
+-- Mappings
+vim.api.nvim_set_keymap('n', '<leader>d<space>', "<cmd>lua require'dap'.continue()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>de', "<cmd>lua require'dap'.terminate()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dn", "<cmd>lua require'dap'.step_over()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dj", "<cmd>lua require'dap'.step_into()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dk", "<cmd>lua require'dap'.step_out()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>du", "<cmd>lua require'dap'.up()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dd", "<cmd>lua require'dap'.down()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dh", "<cmd>lua require'dap.ui.widgets'.hover()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dc", "<cmd>lua require'dap'.run_to_cursor()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>db", "<cmd>lua require'dap'.toggle_breakpoint()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dB", "<cmd>lua require'dap'.toggle_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>dro", "<cmd>lua require'dap'.repl.open()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>drr", "<cmd>lua require'dap'.repl.toggle()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap("n", "<leader>drc", "<cmd>lua require'dap'.repl.close()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>dfb', "<cmd>lua require'telescope'.extensions.dap.list_breakpoints()<cr>", {noremap=true})
+vim.api.nvim_set_keymap('n', '<leader>dfv', "<cmd>lua require'telescope'.extensions.dap.variables()<cr>", {noremap=true})
+vim.api.nvim_set_keymap('n', '<leader>dff', "<cmd>lua require'telescope'.extensions.dap.variables()<cr>", {noremap=true})
+vim.api.nvim_set_keymap('n', '<leader>dfc', "<cmd>lua require'telescope'.extensions.dap.commands()<cr>", {noremap=true})
+vim.api.nvim_set_keymap('n', '<leader>dtr', "<cmd>DapVirtualTextForceRefresh<cr>", {noremap=true})
+
 
 -- Use %% cells for jupytext
 vim.g.jupytext_fmt = 'py:percent'
@@ -552,24 +781,33 @@ require('toggleterm').setup{
   start_in_insert = true,
 }
 
-
 -- Run a python file in terminal (opens one if none opened)
 -- Subsitute spaces with '\ ' in final command
 function RunPyFile()
-  -- TODO: probably a better way to do this with toggleterm+lua
+  -- TODO: probably a way to do this with toggleterm+lua
   -- TODO: Separate function to handle the "shellescape" part
   local myfn = vim.fn.expand('%'):gsub(" ", "\\\\ "):gsub("#", "\\\\#")
   vim.cmd([[:TermExec cmd="python ]] .. myfn .. [["<CR>]])
 end
+function RunPyTest()
+  vim.cmd([[:TermExec cmd="pytest"<CR>]])
+end
+function RunPyTestFile()
+  -- TODO: probably a way to do this with toggleterm+lua
+  -- TODO: Separate function to handle the "shellescape" part
+  local myfn = vim.fn.expand('%'):gsub(" ", "\\\\ "):gsub("#", "\\\\#")
+  vim.cmd([[:TermExec cmd="pytest ]] .. myfn .. [["<CR>]])
+end
 -- local mycmd = ':TermExec cmd="lua RunFile()python %' .. myfn .. '"<CR>'
 vim.api.nvim_set_keymap('n', '<leader>pr', ":lua RunPyFile()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>ptt', ":lua RunPyTest()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>ptf', ":lua RunPyTestFile()<CR>", {noremap = true, silent = true})
 
 -- Setup nvim-ipy
 -- Gruvbox dark has dark text on dark background, so using light
 vim.cmd [[ command! -nargs=0 RunQtConsole call jobstart("jupyter qtconsole --JupyterWidget.include_other_output=True") ]]
 function SetupKernel()
   vim.cmd [[ RunQtConsole ]]
-  -- TODO: Make work with windows
   -- Wait for console to open before connecting kernel
   os.execute("sleep 3")
   vim.cmd [[ IPython --existing --no-window ]]
@@ -584,6 +822,15 @@ vim.api.nvim_set_keymap('n', '<leader>rr', '<Plug>(IPy-Run)', {silent = true})
 vim.api.nvim_set_keymap('n', '<leader>ra', '<Plug>(IPy-RunAll)', {silent = true})
 vim.api.nvim_set_keymap('n', '<leader>ro', '<Plug>(IPy-RunOp)', {silent = true})
 
+-- Setup iron (sometimes more convenient to have REPL in nvim directly)
+-- Last command laso requires hydrogen text object
+vim.api.nvim_set_keymap('n', '<leader>ir', ':IronRepl<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>if', ':IronFocus<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>is', ':IronRestart<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>x', 'ctrah]h', {})
+vim.g.iron_map_extended = 0
+
+
 -- Firenvim (off by default, use shortcut to set for FF addon to activate)
 vim.opt.guifont = 'DejaVu\\ Sans\\ Mono:h18'
 vim.g.firenvim_config = { localSettings = { ['.*'] = { takeover = 'never' } } }
@@ -593,6 +840,9 @@ local telescope = require('telescope')
 telescope.load_extension('fzy_native')
 telescope.load_extension('z')
 telescope.setup {
+  defaults = {
+    file_ignore_patterns = {"venv"},
+  },
   extensions = {
     project = {
       base_dir = '~',
@@ -610,11 +860,37 @@ telescope.setup {
     }
   }
 }
+telescope.load_extension('dap')
 
 -- built-in telescope mappings
-vim.api.nvim_set_keymap('n', '<leader>ff', [[<cmd>lua require('telescope.builtin').find_files()<cr>]], {noremap=true})
-vim.api.nvim_set_keymap('n', '<leader>fc', [[<cmd>lua require('telescope.builtin').live_grep()<cr>]], {noremap=true})
-vim.api.nvim_set_keymap('n', '<leader>fb', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], {noremap=true})
-vim.api.nvim_set_keymap('n', '<leader>fh', [[<cmd>lua require('telescope.builtin').help_tags()<cr>]], {noremap=true})
-vim.api.nvim_set_keymap('n', '<leader>fi', [[<cmd>lua require('telescope.builtin').symbols()<cr>]], {noremap=true})
-vim.api.nvim_set_keymap('n', '<leader>fz', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<cr>]], { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>ff', function() require('telescope.builtin').find_files() end)
+vim.keymap.set('n', '<leader>fc', function() require('telescope.builtin').live_grep() end)
+vim.keymap.set('n', '<leader>fb', function() require('telescope.builtin').buffers() end)
+vim.keymap.set('n', '<leader>fh', function() require('telescope.builtin').help_tags() end)
+vim.keymap.set('n', '<leader>fi', function() require('telescope.builtin').symbols() end)
+vim.keymap.set('n', '<leader>fz', function() require('telescope.builtin').current_buffer_fuzzy_find() end)
+vim.keymap.set('n', '<leader>gc', function() require('telescope.builtin').git_commits() end)
+vim.keymap.set('n', '<leader>gb', function() require('telescope.builtin').git_branches() end)
+vim.keymap.set('n', '<leader>gs', function() require('telescope.builtin').git_status() end)
+vim.keymap.set('n', '<leader>gf', function() require('telescope.builtin').git_bcommits() end)
+vim.keymap.set('n', '<leader>wo', function() require('telescope.builtin').lsp_document_symbols() end)
+vim.api.nvim_set_keymap('n', '<leader>ft', "<cmd>TodoTelescope<CR>", { noremap = true, silent = true })
+
+vim.keymap.set('n', '<leader>gg', ":Neogit<CR>", {noremap = true})
+vim.keymap.set('n', '<leader>gd', ":DiffviewOpen<CR>", {noremap = true})
+vim.keymap.set('n', '<leader>tc', ":tabclose<CR>", {noremap = true})
+
+ if vim.fn.executable "gh" == 1 then
+  vim.keymap.set('n', '<leader>gii', ":Octo issue list<CR>", {noremap = true})
+  vim.keymap.set('n', '<leader>gpp', ":Octo pr list<CR>", {noremap = true})
+  vim.keymap.set('n', '<leader>gis', ":Octo issue search<CR>", {noremap = true})
+  vim.keymap.set('n', '<leader>gps', ":Octo pr search<CR>", {noremap = true})
+end
+
+vim.api.nvim_set_keymap('n', '<leader>gY', '<cmd>lua require"gitlinker".get_repo_url()<cr>', {silent = true})
+vim.api.nvim_set_keymap('n', '<leader>gB', '<cmd>lua require"gitlinker".get_repo_url({action_callback = require"gitlinker.actions".open_in_browser})<cr>', {silent = true})
+
+-- ARsync mappings
+vim.api.nvim_set_keymap("n", "<leader>su", ":ARsyncUp<CR>", {noremap = true})
+vim.api.nvim_set_keymap("n", "<leader>sk", ":ARsyncUpDelete<CR>", {noremap = true})
+vim.api.nvim_set_keymap("n", "<leader>sd", ":ARsyncDown<CR>", {noremap = true})

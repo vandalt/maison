@@ -1,0 +1,5 @@
+#!/bin/bash
+
+notify-send "Bon matin!"
+
+# gsettings set org.gnome.Terminal.ProfilesList default 'ed9c87ba-4b15-47db-911e-0ff7b4f353f1'

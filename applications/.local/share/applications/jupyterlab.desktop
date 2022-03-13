@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Jupyter Lab
+Comment=Start Jupyter Lab server
+Exec=gnome-terminal --title "Jupyter Lab" --class jupyter-lab -- jupyter lab --port 8888
+Icon=/home/vandal/Pictures/jupyter-lab.svg
+Type=Application
+Categories=Development;
+StartupNotify=true
+StartupWMClass=jupyter-lab
+Actions=open-browser
+Keywords=Jupyter;Jlab;Notebook;Ipython;Launcher
+
+[Desktop Action open-browser]
+Name=Open in browser
+Exec=xdg-open http://localhost:8888/lab

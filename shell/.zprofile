@@ -1,9 +1,7 @@
-#!/bin/sh
+#!/bin/zsh
 ## source: https://github.com/Manjaro-Sway/desktop-settings/blob/sway/community/sway/etc/skel/.profile
 ## make default editor Neovim
 export EDITOR=nvim
-
-export TEST_VAR=asdfasf
 
 #
 #eval $(gnome-keyring-daemon --start)
@@ -36,3 +34,5 @@ then
 fi
 export PATH
 
+# For juypter lab
+export WEBBPSF_PATH=$HOME/Documents/jwst/data/webbpsf-data

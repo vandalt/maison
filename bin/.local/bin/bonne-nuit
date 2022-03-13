@@ -1,0 +1,5 @@
+#!/bin/bash
+
+notify-send "Bonne nuit!"
+
+# gsettings set org.gnome.Terminal.ProfilesList default '77e6fa01-9b5b-46d9-8d7d-31054474d48a'

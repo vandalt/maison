@@ -25,38 +25,21 @@ data.location=/home/vandal/.task
 
 include ~/.tasksync
 
-# Color theme (uncomment one to use)
-#include light-16.theme
-#include light-256.theme
-#include dark-16.theme
-#include dark-256.theme
-#include dark-red-256.theme
-#include dark-green-256.theme
-#include dark-blue-256.theme
-#include dark-violets-256.theme
-#include dark-yellow-green.theme
-include dark-gray-256.theme
-#include dark-gray-blue-256.theme
-#include solarized-dark-256.theme
-#include solarized-light-256.theme
-#include no-color.theme
 
-context.work.read=+research
-context.work.write=+research
-news.version=2.6.0
-context.weeklyReview.read=proj:weeklyReview
-context.weeklyReview.write=proj:weeklyReview
-uda.reviewed.type=date
-uda.reviewed.label=Reviewed
-report._reviewed.description=Tasksh review report.  Adjust the filter to your needs.
-report._reviewed.columns=uuid
-report._reviewed.sort=reviewed+,modified+
-report._reviewed.filter=( reviewed.none: or reviewed.before:now-6days ) and ( +PENDING or +WAITING )
-context.initiasciences.read=proj:is
-context.initiasciences.write=proj:is
-context.dailyReview.read=project:dailyReview or project:inbox
-context.nirps.read=proj:nirps
-context.nirps.write=proj:nirps
-context.perso.read=-research -outreach
-context.hrs-proposal.read=proj:nirps.gto +research
-context.hrs-proposal.write=proj:nirps.gto +research
+# Color theme (uncomment one to use)
+#include /usr/share/task/light-16.theme
+#include /usr/share/task/light-256.theme
+#include /usr/share/task/dark-16.theme
+#include /usr/share/task/dark-256.theme
+#include /usr/share/task/dark-red-256.theme
+#include /usr/share/task/dark-green-256.theme
+#include /usr/share/task/dark-blue-256.theme
+#include /usr/share/task/dark-violets-256.theme
+#include /usr/share/task/dark-yellow-green.theme
+#include /usr/share/task/dark-gray-256.theme
+#include /usr/share/task/dark-gray-blue-256.theme
+#include /usr/share/task/solarized-dark-256.theme
+#include /usr/share/task/solarized-light-256.theme
+#include /usr/share/task/no-color.theme
+include ~/.task/theme.theme
+context.hrs-proposal=proj:nirps.gto +research

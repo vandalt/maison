@@ -7,7 +7,11 @@ fi
 
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
 then
-  PATH="$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin:$PATH"
+  PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+if ! [[ "$PATH" =~ "$HOME/.cargo/bin" ]]
+then
+  PATH="$HOME/.cargo/bin:$PATH"
 fi
 
 # Put extra completions in zfunc
@@ -17,10 +21,9 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/doc/pkgfile/command-not-found.zsh
+source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 setopt autocd
 
@@ -30,10 +33,10 @@ compinit
 
 source ~/.zsh/keybindings.zsh
 source ~/.zsh/git.zsh
+source ~/.zsh/python.zsh
 
 # Must be after vi/emacs mode
-source /usr/share/fzf/key-bindings.zsh
-source /usr/share/fzf/completion.zsh
+source /usr/share/fzf/shell/key-bindings.zsh
 
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -53,6 +56,7 @@ alias lla='ls -la'
 alias la='ls -a'
 alias lsd='ls -d'
 alias ltr='ls -ltr'
+alias rmr='rm -rI'
 alias dh='du -sch *'
 alias dha='du -d 1 -h .'
 alias untar='tar -xvf'
@@ -60,6 +64,7 @@ alias guntar='tar -xzvf'
 alias buntar='tar -xjvf'
 alias open='xdg-open'
 alias ...="cd ../.."
+alias gof="open ."
 
 alias t='task'
 
@@ -70,14 +75,11 @@ alias mutt='neomutt'
 alias auracle='auracle -C ~/aur'
 
 # Editor
+alias v='nvim'
 alias vim='nvim'
+# To enable reverse search with synctex by double-clicking PDF
+alias vimtex='NVIM_LISTEN_ADDRESS=/tmp/texsocket nvim'
 alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland'
-
-# Python
-alias p='ipython'
-# enable shared libraries (requied for some packages like theano)
-alias spyenv='env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv'
-alias pup='python -m pip install -U pip'
 
 # Notifications in sway
 # NOTE: No "toggle" for mako modes yet (https://github.com/emersion/mako/pull/382)
@@ -144,3 +146,5 @@ fi
 if command -v zoxide 1>/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
 fi
+
+alias luamake=/home/vandal/programs/lua-language-server/3rd/luamake/luamake
