@@ -4,7 +4,7 @@
 
 base00 = "#24283b"
 base01 = "#1f2335"
-base02 = "#292e42"
+base02 = "#3b425e"
 base03 = "#565f89"
 base04 = "#a9b1d6"
 base05 = "#c0caf5"
