@@ -116,10 +116,6 @@ config.set('content.headers.user_agent', 'Mozilla/5.0 ({os_info}) AppleWebKit/53
 
 # Load images automatically in web pages.
 # Type: Bool
-config.set('content.images', True, 'chrome-devtools://*')
-
-# Load images automatically in web pages.
-# Type: Bool
 config.set('content.images', True, 'devtools://*')
 
 # Enable JavaScript.
@@ -137,6 +133,9 @@ config.set('content.javascript.enabled', True, 'chrome://*/*')
 # Enable JavaScript.
 # Type: Bool
 config.set('content.javascript.enabled', True, 'qute://*/*')
+
+# Enable github copy
+config.set('content.javascript.can_access_clipboard', True, 'https://github.com')
 
 # Editor (and arguments) to use for the `edit-*` commands. The following
 # placeholders are defined:  * `{file}`: Filename of the file to be
