@@ -102,6 +102,9 @@ alias cnvim='nvim ~/.config/nvim/init.lua'
 alias csway='nvim ~/.config/sway/config'
 alias zshrc='nvim ~/.zshrc'
 
+setopt +o nomatch
+alias texclean='rm *.aux *.fls *.fdb_latexmk *.log *.out *.vrb *.nav *.snm *.synctex.* *.toc'
+
 export THEANO_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
 export WEBBPSF_PATH=$HOME/Documents/jwst/data/webbpsf-data
 
