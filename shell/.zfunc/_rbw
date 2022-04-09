@@ -82,6 +82,14 @@ _arguments "${_arguments_options[@]}" \
     ;;
 esac
 ;;
+(register)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
 (login)
 _arguments "${_arguments_options[@]}" \
 '-h[Prints help information]' \
@@ -108,15 +116,6 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (sync)
 _arguments "${_arguments_options[@]}" \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
-'-V[Prints version information]' \
-'--version[Prints version information]' \
-&& ret=0
-;;
-(ls)
-_arguments "${_arguments_options[@]}" \
-'*--fields=[Fields to display. Available options are id, name, user, folder. Multiple fields will be separated by tabs.]' \
 '-h[Prints help information]' \
 '--help[Prints help information]' \
 '-V[Prints version information]' \
@@ -193,23 +192,6 @@ _arguments "${_arguments_options[@]}" \
 '::user -- Username for the password entry:_files' \
 && ret=0
 ;;
-(gen)
-_arguments "${_arguments_options[@]}" \
-'*--uri=[URI for the password entry]' \
-'--folder=[Folder for the password entry]' \
-'--no-symbols[Generate a password with no special characters]' \
-'--only-numbers[Generate a password consisting of only numbers]' \
-'--nonconfusables[Generate a password without visually similar characters (useful for passwords intended to be written down)]' \
-'--diceware[Generate a password of multiple dictionary words chosen from the EFF word list. The len parameter for this option will set the number of words to generate, rather than characters.]' \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
-'-V[Prints version information]' \
-'--version[Prints version information]' \
-':len -- Length of the password to generate:_files' \
-'::name -- Name of the password entry:_files' \
-'::user -- Username for the password entry:_files' \
-&& ret=0
-;;
 (generate)
 _arguments "${_arguments_options[@]}" \
 '*--uri=[URI for the password entry]' \
@@ -228,17 +210,6 @@ _arguments "${_arguments_options[@]}" \
 && ret=0
 ;;
 (edit)
-_arguments "${_arguments_options[@]}" \
-'--folder=[Folder name to search in]' \
-'-h[Prints help information]' \
-'--help[Prints help information]' \
-'-V[Prints version information]' \
-'--version[Prints version information]' \
-':name -- Name or UUID of the password entry:_files' \
-'::user -- Username for the password entry:_files' \
-&& ret=0
-;;
-(rm)
 _arguments "${_arguments_options[@]}" \
 '--folder=[Folder name to search in]' \
 '-h[Prints help information]' \
@@ -332,22 +303,20 @@ esac
 _rbw_commands() {
     local commands; commands=(
         "config:Get or set configuration options" \
+"register:Register this device with the Bitwarden server" \
 "login:Log in to the Bitwarden server" \
 "unlock:Unlock the local Bitwarden database" \
 "unlocked:Check if the local Bitwarden database is unlocked" \
 "sync:Update the local copy of the Bitwarden database" \
 "list:List all entries in the local Bitwarden database" \
 "ls:List all entries in the local Bitwarden database" \
-"ls:List all entries in the local Bitwarden database" \
 "get:Display the password for a given entry" \
 "code:Display the authenticator code for a given entry" \
 "add:Add a new password to the database" \
 "generate:Generate a new password" \
 "gen:Generate a new password" \
-"gen:Generate a new password" \
 "edit:Modify an existing password" \
 "remove:Remove a given entry" \
-"rm:Remove a given entry" \
 "rm:Remove a given entry" \
 "history:View the password history for a given entry" \
 "lock:Lock the password database" \
@@ -486,6 +455,13 @@ _rbw__purge_commands() {
         
     )
     _describe -t commands 'rbw purge commands' commands "$@"
+}
+(( $+functions[_rbw__register_commands] )) ||
+_rbw__register_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'rbw register commands' commands "$@"
 }
 (( $+functions[_rbw__remove_commands] )) ||
 _rbw__remove_commands() {
