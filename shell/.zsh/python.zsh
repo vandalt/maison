@@ -10,6 +10,11 @@ alias pact='source venv/bin/activate'
 # ipython updates somtimes break things, install only < IPYTHON_MAX_VERSION
 IPYTHON_MAX_VERSION=8
 
+pydefaults() {
+  # Some default packages. In a function to access outside nvenv
+  python -m pip install -U "ipython < 8" ipdb ipykernel pyqt5 flake8 flake8-bugbear isort black
+}
+
 addipy() {
   echo $envName
   envName=$1
@@ -109,8 +114,7 @@ EOF
   # Update pip first
   python -m pip install -U pip wheel
 
-  # Some default packages
-  python -m pip install -U "ipython < 8" ipdb ipykernel
+  pydefaults
 
   # Make env available with jupyterlab
   echo ""
