@@ -79,6 +79,9 @@ alias t='task'
 # Mutt
 alias mutt='neomutt'
 
+# Mathematica wayland
+alias mathematica='QT_QPA_PLATFORM=xcb mathematica'
+
 # Clone and update AUR in aur dir
 alias auracle='auracle -C ~/aur'
 
