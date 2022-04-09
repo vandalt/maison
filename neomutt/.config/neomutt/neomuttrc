@@ -9,6 +9,7 @@ folder-hook 'personal' 'source ~/.config/neomutt/personal.muttrc'  # Personal ac
 
 # Set mailboxes
 source ~/.config/neomutt/boxes.muttrc
+source ~/.config/neomutt/mutt-theme.muttrc
 
 ### General neomutt options
 set beep_new  # Bell on new messages
