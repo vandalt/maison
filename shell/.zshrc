@@ -21,9 +21,14 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 
-source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
+#source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+#source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/doc/pkgfile/command-not-found.zsh
 
 setopt autocd
 
@@ -36,7 +41,9 @@ source ~/.zsh/git.zsh
 source ~/.zsh/python.zsh
 
 # Must be after vi/emacs mode
-source /usr/share/fzf/shell/key-bindings.zsh
+#source /usr/share/fzf/shell/key-bindings.zsh
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
 
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
