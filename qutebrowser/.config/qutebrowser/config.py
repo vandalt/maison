@@ -144,7 +144,8 @@ config.set('content.javascript.can_access_clipboard', True, 'https://github.com'
 # `{line0}`: Same as `{line}`, but starting from index 0. * `{column0}`:
 # Same as `{column}`, but starting from index 0.
 # Type: ShellCommand
-c.editor.command = ['alacritty', '-e', 'nvim', '{file}']
+# c.editor.command = ['alacritty', '-e', 'nvim', '{file}']
+c.editor.command = ['kitty', '-e', 'nvim', '{file}']
 
 # Value to use for `prefers-color-scheme:` for websites. The "light"
 # value is only available with QtWebEngine 5.15.2+. On older versions,
