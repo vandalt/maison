@@ -39,6 +39,7 @@ compinit
 source ~/.zsh/keybindings.zsh
 source ~/.zsh/git.zsh
 source ~/.zsh/python.zsh
+source ~/.zsh/onedrive.zsh
 
 # Must be after vi/emacs mode
 #source /usr/share/fzf/shell/key-bindings.zsh
