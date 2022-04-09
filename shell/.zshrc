@@ -107,6 +107,7 @@ alias texclean='rm *.aux *.fls *.fdb_latexmk *.log *.out *.vrb *.nav *.snm *.syn
 
 export THEANO_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
 export WEBBPSF_PATH=$HOME/Documents/jwst/data/webbpsf-data
+export PYSYN_CDBS=$HOME/Documents/jwst/data/trds
 
 # Kitty
 if [ $TERM = "xterm-kitty" ]; then
