@@ -18,3 +18,5 @@ qutebrowser/.config/qutebrowser/autoconfig.yml
 qutebrowser/.config/qutebrowser/bookmarks/
 qutebrowser/.config/qutebrowser/qsettings/
 qutebrowser/.config/qutebrowser/quickmarks
+
+systemd/.config/systemd/user/timers.target.wants/
