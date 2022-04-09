@@ -4,6 +4,7 @@
 if [ $# -lt 2 ]
 then
     echo "Usage: mergepdf requires at least 2 pdf files to merge"
+    exit 1
 fi
 
 pdftk "$@" cat output combined.pdf
