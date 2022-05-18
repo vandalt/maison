@@ -12,13 +12,14 @@ set $down j
 set $up k
 set $right l
 # Terminal
-set $term alacritty
+set $term kitty
 # Bin with sway commands
 set $bin ~/.local/bin/sway
 # App launchers ($menu is all commands and $appmneu is desktop menu)
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-set $menu demnu_path | wofi -I --show run | xargs swaymsg exec --
+# I don't really use this one and can shutdown if mistype command
+# set $menu demnu_path | wofi -I --show run | xargs swaymsg exec --
 set $appmenu dmenu_path | wofi -I --show drun -i | xargs swaymsg exec --
 set $passmenu $bin/rbw-wofi
 # Main laptop output, to map touchscreen and pen
@@ -29,12 +30,14 @@ set $finger "1386:20963:Wacom_HID_51E3_Finger"
 set $pen "1386:20963:Wacom_HID_51E3_Pen"
 # Background
 # set $background /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png
-set $background ~/Pictures/aurores/snow.jpg
+# set $background ~/Pictures/aurores/snow.jpg
+# set $background ~/Pictures/earth_at_night.jpg
+set $background ~/Pictures/falaise_etoiles.jpg
 # Screen lock command, with same image as background (other options are in config file)
 set $lock swaylock -i $background
 # Browser
-set $browser firefox
-set $browser2 qutebrowser
+set $browser qutebrowser
+set $browser2 firefox
 set $mail $term --class neomutt --title Neomutt -e neomutt
 set $files $term --class nnn --title Files -e nnn
 # Screenshot commands
@@ -114,24 +117,31 @@ for_window [app_id="gnome-font-viewer"] floating enable
 for_window [app_id="pulseUI"] floating enable
 for_window [app_id="blueberry.py"] floating enable
 for_window [app_id="galculator"] floating enable
+# GTK 3
 for_window [app_id="gnome-calculator"] floating enable
+# GTK 4
+for_window [app_id="org.gnome.Calculator"] floating enable
 for_window [app_id="thunar"] floating enable
 for_window [app_id="imv"] floating enable
 for_window [app_id="zoom"] floating enable
+for_window [app_id="system-config-printer"] floating enable
 for_window [app_id="ipython" title="Figure .*"] floating enable
 for_window [app_id="python" title="Figure .*"] floating enable
+for_window [app_id="python" title="New .* Okular"] floating enable
 for_window [app_id="python3" title="Figure .*"] floating enable
 for_window [app_id="firefox" title="Sharing Indicator"] floating enable
 for_window [app_id="firefox" title="Library"] floating enable
 for_window [app_id="firefox" title="Picture-in-Picture"] floating enable
 for_window [app_id="org.gnome.Solanum"] floating enable
 for_window [app_id="org.kde.kdeconnect*"] floating enable
+for_window [app_id="otpclient" title="Password"] floating enable
 for_window [class="jetbrains-pycharm" title="Welcome to PyCharm"] floating enable
 for_window [class="Matplotlib"] floating enable
 for_window [class="edu-stsci-apt-controller-APT" title="Open"] floating enable
 for_window [class="jetbrains-pycharm" title="win0"] floating enable
 for_window [class="uk-ac-starlink-topcat-Driver"] floating enable
 for_window [class="Ds9.tcl"] floating enable
+for_window [class="TkMotifFDialog" title="Open"] floating enable
 for_window [class="Toplevel"] floating enable
 
 
@@ -146,8 +156,6 @@ for_window [class="Toplevel"] floating enable
     bindsym $mod+i exec $browser
     bindsym $mod+Shift+i exec $browser2
 
-    bindsym $mod+Shift+p exec $passmenu
-
     # Start email client
     bindsym $mod+m exec $mail
 
@@ -158,7 +166,8 @@ for_window [class="Toplevel"] floating enable
     bindsym $mod+Shift+q kill
 
     # Start your launcher
-    bindsym $mod+d exec $menu
+    # bindsym $mod+d exec $menu
+    bindsym $mod+Shift+p exec $passmenu
     bindsym $mod+Shift+d exec $appmenu
 
     # Drag floating windows by holding down $mod and left mouse button.
@@ -257,6 +266,7 @@ for_window [class="Toplevel"] floating enable
 
     # Toggle the current focus between tiling and floating mode
     bindsym $mod+Shift+space floating toggle
+    bindsym $mod+Shift+s sticky toggle
 
     # Swap focus between the tiling area and the floating area
     bindsym $mod+space focus mode_toggle
@@ -277,6 +287,12 @@ for_window [class="Toplevel"] floating enable
     # If there are multiple scratchpad windows, this command cycles through them.
     bindsym $mod+equal scratchpad show
 #
+# Custom:
+#
+    # Middle point
+    # TODO: make this work
+    # bindsym Mod1+Period exec "ydotool key 29:1 42:1 22:1 29:0 42:0 22:0 48:1 48:0 8:1 8:0 28:1 28:0"
+#
 # System/media keys
 #
     # Special keys
@@ -286,7 +302,10 @@ for_window [class="Toplevel"] floating enable
     bindsym --locked XF86AudioMicMute exec $onscreen_bar $(pactl set-source-mute @DEFAULT_SOURCE@ toggle && pactl get-source-mute @DEFAULT_SOURCE@ | sed -En "/no/ s/.*/$($source_volume)/p; /yes/ s/.*/0/p")
     bindsym --locked XF86MonBrightnessDown exec $onscreen_bar $(brightnessctl set 5%- | sed -En 's/.*\(([0-9]+)%\).*/\1/p')
     bindsym --locked XF86MonBrightnessUp exec $onscreen_bar $(brightnessctl set +5% | sed -En 's/.*\(([0-9]+)%\).*/\1/p')
+    # Bluetooth keyboard uses this
     bindsym --locked XF86AudioPlay exec playerctl play-pause
+    # Bluetooth headset uses this
+    bindsym --locked XF86AudioPause exec playerctl play-pause
     bindsym --locked XF86AudioNext exec playerctl next
     bindsym --locked XF86AudioPrev exec playerctl previous
 
@@ -309,7 +328,7 @@ for_window [class="Toplevel"] floating enable
     # Area to clipboard
     bindsym --release Control+Shift+Print exec $areaclip
 
-    bindsym --release $mod+Control+p exec $colorpicker
+    bindsym --release $mod+Shift+o exec $colorpicker
 #
 # Resizing containers:
 #
@@ -399,8 +418,8 @@ exec $notifications
 exec_always "pkill kanshi; exec kanshi"
 # Not sure the first line is needed.
 # Indiciator won't show at first, open phone then should connect and show up
-exec kdeconnect-cli -n "Pixel 4A"
-exec kdeconnect-indicator
+# exec kdeconnect-cli -n "Pixel 4A"
+# exec kdeconnect-indicator
 
 
 #

@@ -100,6 +100,7 @@ alias dndoff='makoctl set-mode default'
 # Quick access to config files
 alias cnvim='nvim ~/.config/nvim/init.lua'
 alias csway='nvim ~/.config/sway/config'
+alias ctask='nvim ~/.config/task/taskrc'
 alias zshrc='nvim ~/.zshrc'
 
 setopt +o nomatch
@@ -108,6 +109,8 @@ alias texclean='rm *.aux *.fls *.fdb_latexmk *.log *.out *.vrb *.nav *.snm *.syn
 export THEANO_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
 export WEBBPSF_PATH=$HOME/Documents/jwst/data/webbpsf-data
 export PYSYN_CDBS=$HOME/Documents/jwst/data/trds
+export CRDS_PATH=$HOME/crds_cache
+export CRDS_SERVER_URL=https://jwst-crds.stsci.edu
 
 # Kitty
 if [ $TERM = "xterm-kitty" ]; then

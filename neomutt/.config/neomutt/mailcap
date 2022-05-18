@@ -5,3 +5,7 @@ image/png; imv %s
 # application/pdf; okular %s
 application/pdf; zathura %s
 application/msword; libreoffice --writer %s
+application/vnd.openxmlformats-officedocument.wordprocessingml.document; libreoffice --writer %s
+application/vnd.openxmlformats-officedocument.wordprocessingml.document; libreoffice --writer %s
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; libreoffice --calc %s
+application/vnd.ms-excel; libreoffice --calc %s
