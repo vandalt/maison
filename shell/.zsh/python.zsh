@@ -44,6 +44,7 @@ Arguments:
   -h|--help       Show this message
   -n|--name       Name of the virtual envionment (used to register with ipykernel).
                   Defaults to parent directory name
+  -v|--version    Python version to use to create the environment
   -d|--dir        Directory where venv is created. Defaults to venv
   -e|--exit       Deactivate the  environment after creating it
 EOF
@@ -57,6 +58,10 @@ EOF
         ;;
       -n|--name)
         envName="$2"
+        shift 2
+        ;;
+      -v|--version)
+        pyVer="$2"
         shift 2
         ;;
       -d|--dir)
@@ -86,6 +91,12 @@ EOF
     envDir="venv"
   fi
 
+  if [[ -z "$pyVer" ]]; then
+    pycmd="python"
+  else
+    pycmd="python$pyVer"
+  fi
+
   if [[ -d "$envDir" ]]; then
     echo "Directory $envDir already exists. Exiting."
     return 1
@@ -105,14 +116,14 @@ EOF
     envName=${realParDir##*/}
   fi
 
-  python -m venv $envDir
+  $pycmd -m venv $envDir
 
   source $envDir/bin/activate
 
   echo "Virtual environment using: $(which python)"
 
   # Update pip first
-  python -m pip install -U pip wheel
+  $pycmd -m pip install -U pip wheel
 
   pydefaults
 

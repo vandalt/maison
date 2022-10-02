@@ -11,3 +11,5 @@ blacklistadd localhost:\d+/lab
 blacklistadd overleaf.com/project/
 blacklistadd docs.google.com
 blacklistadd colab.research.google.com
+setnull searchurls.github
+set searchurls.gh https://github.com/search?utf8=✓&q=

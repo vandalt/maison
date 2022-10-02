@@ -25,18 +25,18 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 
-source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
+#source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+#source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 function precmd () {
   echo -ne "\033]0;$(pwd | sed -e "s;^$HOME;~;")\a"
 }
 
-#source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-#source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-#source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-#source /usr/share/doc/pkgfile/command-not-found.zsh
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/doc/pkgfile/command-not-found.zsh
 
 setopt autocd
 
@@ -50,9 +50,9 @@ source ~/.zsh/python.zsh
 source ~/.zsh/onedrive.zsh
 
 # Must be after vi/emacs mode
-source /usr/share/fzf/shell/key-bindings.zsh
-#source /usr/share/fzf/key-bindings.zsh
-#source /usr/share/fzf/completion.zsh
+#source /usr/share/fzf/shell/key-bindings.zsh
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
 
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -95,6 +95,7 @@ alias mathematica='QT_QPA_PLATFORM=xcb mathematica'
 alias auracle='auracle -C ~/aur'
 
 # Editor
+export EDITOR='nvim'
 alias v='nvim'
 alias vim='nvim'
 # To enable reverse search with synctex by double-clicking PDF
@@ -112,19 +113,30 @@ alias csway='nvim ~/.config/sway/config'
 alias ctask='nvim ~/.config/task/taskrc'
 alias zshrc='nvim ~/.zshrc'
 
+# alias jwst-apt='~/programs/APT/APT'
+
 setopt +o nomatch
 alias texclean='rm *.aux *.fls *.fdb_latexmk *.log *.out *.vrb *.nav *.snm *.synctex.* *.toc'
 
 export THEANO_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
-export WEBBPSF_PATH=$HOME/Documents/jwst/data/webbpsf-data
-export PYSYN_CDBS=$HOME/Documents/jwst/data/trds
-export CRDS_PATH=$HOME/crds_cache
+# export XLA_FLAGS="--xla_force_host_platform_device_count=4"
+# export MKL_DYNAMIC=FALSE
+# export MKL_CBWR=COMPATIBLE
+# export OMP_NUM_THREADS=1
+# export OPENBLAS_NUM_THREADS=1
+# export MKL_NUM_THREADS=1
+# export VECLIB_MAXIMUM_THREADS=1
+# export NUMEXPR_NUM_THREADS=1
+export XLA_FLAGS="--xla_force_host_platform_device_count=8 --xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1"
+export WEBBPSF_PATH=$HOME/Documents/data/package-data/webbpsf-data
+export PYSYN_CDBS=$HOME/Documents/data/package-data/trds
+export CRDS_PATH=$HOME/Documents/data/package-data/crds_cache
 export CRDS_SERVER_URL=https://jwst-crds.stsci.edu
 
 # Kitty
 if [ $TERM = "xterm-kitty" ]; then
   LIGHT_COLOR='tokyonight_day.conf'
-  DARK_COLOR='tokyonight_storm.conf'
+  DARK_COLOR='tokyonight_night.conf'
 
   alias tday="cp ~/.config/kitty/themes/$LIGHT_COLOR ~/.config/kitty/theme.conf"
   alias tnight="cp ~/.config/kitty/themes/$DARK_COLOR ~/.config/kitty/theme.conf"
@@ -164,6 +176,11 @@ function csview {
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+JWST_TOKEN_FILE=~/projects/jwst-manage-data/latest_token.txt
+if [[ -f "$JWST_TOKEN_FILE" ]]; then
+  export MAST_API_TOKEN="$(cat $JWST_TOKEN_FILE)"
+fi
 
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init --path)"

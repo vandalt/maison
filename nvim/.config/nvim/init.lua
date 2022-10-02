@@ -39,6 +39,7 @@ require('packer').startup(function()
   use 'tpope/vim-eunuch' -- Enhanced unix shell commands
   use 'tpope/vim-sleuth' -- heuristically set indentation
   use 'tpope/vim-vinegar' -- nicer file navigation
+  -- use 'github/copilot.vim'
   -- use 'axelf4/vim-strip-trailing-whitespace' -- Remove white spaces only on modified lines
   use 'szw/vim-maximizer'
   use "AndrewRadev/splitjoin.vim" -- Join and split lines with gS/gJ
@@ -91,10 +92,13 @@ require('packer').startup(function()
   use { 'jose-elias-alvarez/null-ls.nvim', requires = 'nvim-lua/plenary.nvim' }
   use 'mickael-menu/zk-nvim'
 
-  use 'nvim-orgmode/orgmode'
+  use({'jakewvincent/mkdnflow.nvim',
+      rocks = 'luautf8', -- Ensures optional luautf8 dependency is installed
+  })
 
   use 'ekickx/clipboard-image.nvim'
   use 'hrsh7th/cmp-nvim-lsp'
+  use 'hrsh7th/cmp-path'
   use 'saadparwaiz1/cmp_luasnip'
   use 'L3MON4D3/LuaSnip'
   use 'rafamadriz/friendly-snippets'
@@ -115,6 +119,7 @@ require('packer').startup(function()
   use 'goerz/jupytext.vim' -- Convert and open jupyter notebooks
   use { 'bfredl/nvim-ipy', run = ':UpdateRemotePlugins' }
   use 'hkupty/iron.nvim'
+  use 'jpalardy/vim-slime'
   use { 'GCBallesteros/vim-textobj-hydrogen', requires = 'kana/vim-textobj-user' }
   use 'akinsho/nvim-toggleterm.lua'
   use 'folke/tokyonight.nvim'
@@ -185,6 +190,10 @@ vim.api.nvim_exec([[
 vim.cmd [[syntax enable]]
 -- vim.g.gruvbox_italic = 1
 vim.o.termguicolors = true
+require("tokyonight").setup({
+  style = "night",
+  transparent = true,
+})
 vim.cmd [[colorscheme tokyonight]]
 
 -- Function with a few defaults to write prose (Global so can call in editor)
@@ -198,16 +207,16 @@ function Prose(bufnr)
 
   map('n', '<leader>ap', 'vasgq', { noremap = true }) -- Line to paragraph
   map('n', '<leader>al', 'vipJ', { noremap = true }) -- Paragraph to line
-  vim.bo.textwidth = 80
-  vim.bo.formatoptions = vim.bo.formatoptions .. 't' -- Wrap on width
-  vim.wo.linebreak = true
+  -- vim.bo.textwidth = 80
+  -- vim.bo.formatoptions = vim.bo.formatoptions .. 't' -- Wrap on width
+  -- vim.wo.linebreak = true
   vim.wo.wrap = true
   vim.wo.list = false
   vim.o.display = 'lastline'
-  vim.bo.autoindent = false
-  vim.bo.cindent = false
-  vim.bo.smartindent = false
-  vim.bo.indentexpr = ''
+  -- vim.bo.autoindent = false
+  -- vim.bo.cindent = false
+  -- vim.bo.smartindent = false
+  -- vim.bo.indentexpr = ''
   vim.wo.colorcolumn = ''
   map('n', 'j', 'gj', { noremap = true })
   map('n', 'k', 'gk', { noremap = true })
@@ -216,7 +225,7 @@ function Prose(bufnr)
 end
 
 -- vim.cmd [[autocmd FileType tex,plaintex lua Prose()]]
-vim.cmd [[autocmd BufNewFile,BufRead *.md lua Prose()]]
+vim.cmd [[autocmd BufNewFile,BufRead *.md,*.txt lua Prose()]]
 
 
 -- Mappings
@@ -236,10 +245,15 @@ vim.api.nvim_set_keymap("i", "<M-.>", "<C-v>u00b7", { noremap = true })
 vim.api.nvim_set_keymap('n', '<leader>=', '<C-w>=', { noremap = true })
 vim.api.nvim_set_keymap('n', '<M-,>', '<C-w><', { noremap = true })
 vim.api.nvim_set_keymap('n', '<M-.>', '<C-w>>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<M-S-=>', '<C-w>+', { noremap = true })
+vim.api.nvim_set_keymap('n', '<M-->', '<C-w>-', { noremap = true })
 
 -- Edit and load config
 vim.api.nvim_set_keymap('n', '<leader>cv', ':vsplit $MYVIMRC<CR>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<leader>lv', ':luafile $MYVIMRC<CR>', { noremap = true })
+
+-- Navigate
+-- vim.api.nvim_set_keymap('n', '<leader>v', '<Plug>VinegarUp', { noremap = true })
 
 -- Move line in up or down file
 vim.api.nvim_set_keymap('n', '<C-j>', ':m .+1<CR>==', { noremap = true })
@@ -307,11 +321,11 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>Q', '<cmd>lua vim.diagnostic.setqflist()<CR>', opts)
 
-  if client.resolved_capabilities.document_formatting then
+  if client.server_capabilities.document_formatting then
     vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>sf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
     vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
   end
-  if client.resolved_capabilities.document_range_formatting then
+  if client.server_capabilities.document_range_formatting then
     vim.api.nvim_buf_set_keymap(bufnr, "v", "<leader>sf", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
     FormatRange = function()
       local start_pos = vim.api.nvim_buf_get_mark(0, '<')
@@ -331,7 +345,9 @@ null_ls.setup {
   sources = {
     null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.isort,
-    null_ls.builtins.diagnostics.flake8,
+    null_ls.builtins.diagnostics.flake8.with({
+      args = { "--ignore", "E501,W503,E203,E402,E722", "--format", "default", "--stdin-display-name", "$FILENAME", "-" }
+    }),
     null_ls.builtins.diagnostics.rpmspec,
   },
   on_attach = on_attach,
@@ -378,8 +394,8 @@ local lsp_settings = {
     cmd = { "vscode-json-languageserver", "--stdio" },
   },
   sumneko_lua = {
-    cmd = { "/home/vandal/programs/lua-language-server/bin/lua-language-server", "-E", "/home/vandal/programs/lua-language-server/bin/main.lua" },
-    -- cmd = { "lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua" },
+    -- cmd = { "/home/vandal/programs/lua-language-server/bin/lua-language-server", "-E", "/home/vandal/programs/lua-language-server/bin/main.lua" },
+    cmd = { "lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua" },
     settings = {
       Lua = {
         runtime = {
@@ -412,16 +428,17 @@ local lsp_settings = {
           forwardSearchAfter = true,
           onSave = true,
           -- args = { "-pdf", "-pdflatex=xelatex", "-interaction=nonstopmode", "-synctex=1", "-pvc", "%f" },
+          -- args = { "-pdf", "-pdflatex=lualatex", "-interaction=nonstopmode", "-synctex=1", "-pvc", "%f" },
           args = { "-pdf", "-pdflatex=pdflatex", "-interaction=nonstopmode", "-synctex=1", "%f" },
           -- args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
         },
         forwardSearch = {
-          -- executable = "okular",
-          -- args = {"--unique", "file:%p#src:%l%f"},
+          executable = "okular",
+          args = {"--unique", "file:%p#src:%l%f"},
           -- executable = "zathura",
           -- args = { '--synctex-forward', '%l:1:%f', '%p' },
-          executable =  "evince-synctex",
-          args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
+          -- executable =  "evince-synctex",
+          -- args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
           -- args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
           onSave = true,
         }
@@ -502,7 +519,7 @@ end
 --   custom_on_publish_diagnostics, {})
 
 
---Set statusbar
+-- Set statusbar
 require('lualine').setup {
   options = {
     icons_enabled = true,
@@ -512,11 +529,39 @@ require('lualine').setup {
   },
   sections = {
     lualine_b = { 'branch', 'filename', 'diagnostics' },
-    lualine_c = { function()
-      return vim.fn['nvim_treesitter#statusline'](90)
-    end },
+    -- lualine_c = { function()
+    --   return vim.fn['nvim_treesitter#statusline'](90)
+    -- end },
   },
 }
+
+-- Useful for markdonw link creation and navigation
+vim.cmd('autocmd FileType markdown set autowriteall')
+vim.cmd('autocmd BufLeave *.md silent! wall')
+
+require("mkdnflow").setup({
+  mappings = {
+    MkdnEnter = {{'i', 'n', 'v'}, '<CR>'},
+    MkdnDecreaseHeading = {'n', '='},
+    MkdnTableNewRowBelow = {'n', '<leader>ir'},
+    MkdnTableNewRowAbove = {'n', '<leader>iR'},
+    MkdnTableNewColAfter = {'n', '<leader>ic'},
+    MkdnTableNewColBefore = {'n', '<leader>iC'},
+    MkdnYankAnchorLink = {'n', 'yal'},
+  },
+  links = {
+    conceal = true,
+    transform_explicit = function(text)
+      text = text:gsub(" ", "-")
+      text = text:lower()
+      return(text)
+    end
+  },
+  perspective = {
+    priority = "current",
+    root_tell = "index.md"
+  }
+})
 
 require("zk").setup {
   -- can be "telescope", "fzf" or "select" (`vim.ui.select`)
@@ -541,15 +586,26 @@ require("zk").setup {
   },
 }
 
+function get_date_zw()
+  local start_week_day = "sunday"
+  if string.lower(os.date("%A")) == start_week_day then
+    return "today"
+  else
+    return start_week_day
+  end
+end
+
 local zk_opts = { noremap = true, silent = false }
 -- Create a new note after asking for its title.
-vim.api.nvim_set_keymap("n", "<leader>zn", "<Cmd>ZkNew { title = vim.fn.input('Title: ') }<CR>", zk_opts)
-vim.api.nvim_set_keymap("n", "<leader>zd", "<Cmd>ZkNew { title = vim.fn.input('Title: '), dir = vim.fn.input('Dir: ') }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zn", "<Cmd>ZkNew { title = vim.fn.input('Title: '), dir = vim.fn.input('Dir: ', '', 'dir') }<CR>", zk_opts)
 vim.api.nvim_set_keymap("n", "<leader>zj", "<Cmd>ZkNew { dir = 'journal' }<CR>", zk_opts)
-vim.api.nvim_set_keymap("n", "<leader>zp", "<Cmd>ZkNew { title = vim.fn.input('Title: '), dir = 'projects'}<CR>", zk_opts)
-vim.api.nvim_set_keymap("v", "<leader>zn", ":'<,'>ZkNewFromTitleSelection<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zw", "<Cmd>ZkNew { dir = 'journal/weekly', date = get_date_zw() }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zd", "<Cmd>ZkNew { dir = 'journal/daily' }<CR>", zk_opts)
+vim.api.nvim_set_keymap("v", "<leader>zn", ":'<,'>ZkNewFromTitleSelection { dir = vim.fn.input('Dir: ', '', 'dir') }<CR>", zk_opts)
 -- Open notes.
 vim.api.nvim_set_keymap("n", "<leader>zo", "<Cmd>ZkNotes<CR>", zk_opts)
+-- Index notes
+vim.api.nvim_set_keymap("n", "<leader>zi", "<Cmd>ZkIndex<CR>", zk_opts)
 -- Open notes associated with the selected tags.
 vim.api.nvim_set_keymap("n", "<leader>zt", "<Cmd>ZkTags<CR>", zk_opts)
 -- Search for the notes matching a given query.
@@ -560,13 +616,10 @@ vim.api.nvim_set_keymap("n", "<leader>zb", "<Cmd>ZkBacklinks<CR>", zk_opts)
 -- Search for the notes matching the current visual selection.
 vim.api.nvim_set_keymap("v", "<leader>zf", ":'<,'>ZkMatch<CR>", zk_opts)
 
-require('orgmode').setup_ts_grammar()
-
--- Treesitter config
+-- -- Treesitter config
 require 'nvim-treesitter.configs'.setup {
   ensure_installed = {
     "python",
-    "org",
     "bash",
     "c",
     "lua",
@@ -581,9 +634,7 @@ require 'nvim-treesitter.configs'.setup {
   },
   highlight = {
     enable = true,
-    -- disable = {'org'}, -- Remove this to use TS highlighter for some of the highlights (Experimental)
     disable = { 'html' },
-    additional_vim_regex_highlighting = { 'org' }, -- Required since TS highlighter doesn't support all syntax features (conceal)
   },
   incremental_selection = {
     enable = true,
@@ -648,11 +699,6 @@ require 'nvim-treesitter.configs'.setup {
   },
 }
 
-require('orgmode').setup {
-  org_agenda_files = { '~/org/*' },
-  org_default_notes_file = '~/org/refile.org',
-}
-
 -- LuaSnip setup
 local luasnip = require 'luasnip'
 require("luasnip.loaders.from_vscode").load()
@@ -670,7 +716,7 @@ cmp.setup {
     ['<C-n>'] = cmp.mapping.select_next_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-Space>'] = cmp.mapping.complete({}),
     ['<C-e>'] = cmp.mapping.close(),
     ['<C-i>'] = cmp.mapping.confirm {
       -- Replaces chars after suggestion
@@ -701,7 +747,7 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
-    { name = 'orgmode' },
+    { name = 'path' },
   },
 }
 
@@ -715,6 +761,7 @@ vim.keymap.set('n', '<leader>lt', ':LspStop<CR>', { silent = true })
 vim.g.doge_mapping = '<leader>ld'
 -- python docstring types
 vim.g.doge_doc_standard_python = 'sphinx'
+vim.keymap.set('n', '<leader>ln', ':DogeGenerate numpy<CR>', { silent = true })
 
 
 -- If you want insert `(` after select function or method item
@@ -725,12 +772,12 @@ cmp.event:on(
 )
 
 -- add a lisp filetype (wrap my-function), FYI: Hardcoded = { "clojure", "clojurescript", "fennel", "janet" }
-cmp_autopairs.lisp[#cmp_autopairs.lisp + 1] = "racket"
+-- cmp_autopairs.lisp[#cmp_autopairs.lisp + 1] = "racket"
 
 -- put this to setup function and press <a-e> to use fast_wrap
 local npairs = require('nvim-autopairs')
 npairs.setup({
-  fast_wrap = {},
+ fast_wrap = {},
 })
 
 
@@ -842,7 +889,7 @@ require("todo-comments").setup {
     },
   },
 }
--- require("which-key").setup()
+require("which-key").setup()
 require("trouble").setup()
 require("fidget").setup()
 
@@ -935,6 +982,10 @@ function SetupKernel()
   vim.cmd [[ IPython --existing --no-window ]]
 end
 
+-- vim.g.slime_target = "neovim"
+vim.g.slime_target = "kitty"
+-- vim.g.slime_bracketed_paste = 1
+
 vim.g.ipy_celldef = '^# %%'
 vim.g.nvim_ipy_perform_mappings = 0
 vim.api.nvim_set_keymap('n', '<leader>jqt', ':RunQtConsole<CR>', { noremap = true, silent = true })
@@ -956,9 +1007,16 @@ iron.setup {
       python = require("iron.fts.python").ipython,
       nirps = {
         command = {"ssh", "pmaestria", "conda", "activate", "nirps-comm;", "ipython"}
+      },
+      jwst = {
+        command = {"ssh", "pmaestria", "conda", "activate", "jwst-kpi;", "ipython"}
+      },
+      wise = {
+        command = {"ssh", "pmaestria", "mamba", "activate", "wise-1828;", "ipython"}
       }
     },
-    repl_open_cmd = 'topleft vertical 88 split',
+    -- repl_open_cmd = 'topleft vertical 88 split',
+    repl_open_cmd = require("iron.view").split.botright("30%")
   },
   keymaps = {
     send_motion = "<leader>sc",
@@ -971,28 +1029,40 @@ iron.setup {
   }
 }
 
--- local function open_custom_repl()
---   local repl_name = vim.fn.input("Enter repl: ")
---   _G.current_repl = repl_name
---   vim.cmd([[:IronRepl ]] .. repl_name)
--- end
---
--- local function get_current_repl()
---   if current_repl then
---     return current_repl
---   else
---     return ""
---   end
--- end
---
--- local function wrap_iron_command(iron_cmd)
---   vim.cmd([[:]] .. iron_cmd .. [[ ]] .. get_current_repl())
--- end
+local function open_custom_repl()
+  local repl_name = vim.fn.input("Enter repl: ")
+  _G.current_repl = repl_name
+  vim.cmd([[:IronRepl ]] .. repl_name)
+end
 
--- vim.keymap.set('n', '<leader>ir', function() wrap_iron_command("IronRepl") end, {})
--- vim.keymap.set("n", "<leader>ic", open_custom_repl, {noremap = true, silent = false})
+local function get_current_repl()
+  if current_repl then
+    return current_repl
+  else
+    return ""
+  end
+end
+
+local ll = require("iron.lowlevel")
+local ll_default_buffer = ll.get_buffer_ft
+
+ll.get_buffer_ft = function(bufnr)
+  local current = get_current_repl()
+  if current == nil or current == "" then
+    return ll_default_buffer(bufnr)
+  end
+  return current
+end
+
+
+local function wrap_iron_command(iron_cmd)
+  vim.cmd([[:]] .. iron_cmd .. [[ ]] .. get_current_repl())
+end
+
+vim.keymap.set('n', '<leader>ir', function() wrap_iron_command("IronRepl") end, {})
+vim.keymap.set("n", "<leader>ic", open_custom_repl, {noremap = true, silent = false})
 -- vim.keymap.set('n', '<leader>if', function() wrap_iron_command("IronFocus") end, {})
-vim.api.nvim_set_keymap('n', '<leader>ir', ':IronRepl<CR>', {})
+-- vim.api.nvim_set_keymap('n', '<leader>ir', ':IronRepl<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>is', ':IronRestart<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>if', ':IronFocus<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>is', ':IronRestart<CR>', {})
@@ -1002,6 +1072,7 @@ vim.api.nvim_set_keymap('n', '<leader>x', '<leader>scahj]h', {})
 -- Firenvim (off by default, use shortcut to set for FF addon to activate)
 vim.opt.guifont = 'DejaVu\\ Sans\\ Mono:h18'
 vim.g.firenvim_config = { localSettings = { ['.*'] = { takeover = 'never' } } }
+vim.cmd [[au BufEnter github.com_*.txt set filetype=markdown]]
 
 -- Telescope extensions
 local telescope = require('telescope')
