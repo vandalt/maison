@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name= Topcat
+GenericName= Topcat
+Comment=Tool for OPerations on Catalogues And Tables
+Exec=topcat
+Icon=/home/vandal/Pictures/topcat.svg
+Terminal=false
+Type=Application
+Categories=Application;Sciences;Other;

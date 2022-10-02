@@ -1,8 +1,5 @@
 # .bashrc
 
-# If not running interactively, don't do anything
-[[ $- != *i* ]] && return
-
 # Source global definitions
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
@@ -32,3 +29,5 @@ if [ -d ~/.bashrc.d ]; then
 fi
 
 unset rc
+
+alias luamake=/home/vandal/programs/lua-language-server/3rd/luamake/luamake

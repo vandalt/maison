@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /home/vandal/programs/ccls/Release/ccls "$@"

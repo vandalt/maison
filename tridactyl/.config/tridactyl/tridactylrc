@@ -5,6 +5,8 @@ bind ? fillcmdline find -?
 bind n findnext 1
 bind N findnext -1
 bind ,<Space> nohlsearch
+bind O fillcmdline tabopen
+bind t current_url open
 blacklistadd localhost:\d+/lab
 blacklistadd overleaf.com/project/
 blacklistadd docs.google.com

@@ -3,10 +3,8 @@ Version=1.0
 Type=Application
 Name=Mathematica 13
 Comment=Technical Computing System
-TryExec=/usr/bin/Mathematica
-Exec=env QT_QPA_PLATFORM=xcb /usr/bin/Mathematica %F
+TryExec=/usr/local/Wolfram/Mathematica/13.0/Executables/Mathematica
+Exec=/usr/local/Wolfram/Mathematica/13.0/Executables/Mathematica --name M-13.0 %F
 Icon=wolfram-mathematica
 StartupWMClass=M-13.0
 MimeType=application/mathematica;application/x-mathematica;application/vnd.wolfram.nb;application/vnd.wolfram.cdf;application/vnd.wolfram.player;application/vnd.wolfram.mathematica.package;application/vnd.wolfram.wl;x-scheme-handler/wolfram+cloudobject;x-scheme-handler/wolframmathematica+cloudobject;
-Categories=Science;Education;Languages;ArtificialIntelligence;Astronomy;Biology;Chemistry;ComputerScience;DataVisualization;Geography;ImageProcessing;Math;NumericalAnalysis;MedicalSoftware;Physics;ParallelComputer;
-StartupWMClass=Mathematica;

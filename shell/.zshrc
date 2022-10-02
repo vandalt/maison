@@ -13,6 +13,10 @@ if ! [[ "$PATH" =~ "$HOME/.cargo/bin" ]]
 then
   PATH="$HOME/.cargo/bin:$PATH"
 fi
+if ! [[ "$PATH" =~ "$HOME/go/bin" ]]
+then
+  PATH="$HOME/go/bin:$PATH"
+fi
 
 # Put extra completions in zfunc
 fpath+=~/.zfunc
@@ -21,14 +25,18 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 
-#source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
-#source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-#source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/doc/pkgfile/command-not-found.zsh
+function precmd () {
+  echo -ne "\033]0;$(pwd | sed -e "s;^$HOME;~;")\a"
+}
+
+#source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+#source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+#source /usr/share/doc/pkgfile/command-not-found.zsh
 
 setopt autocd
 
@@ -42,9 +50,9 @@ source ~/.zsh/python.zsh
 source ~/.zsh/onedrive.zsh
 
 # Must be after vi/emacs mode
-#source /usr/share/fzf/shell/key-bindings.zsh
-source /usr/share/fzf/key-bindings.zsh
-source /usr/share/fzf/completion.zsh
+source /usr/share/fzf/shell/key-bindings.zsh
+#source /usr/share/fzf/key-bindings.zsh
+#source /usr/share/fzf/completion.zsh
 
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -73,6 +81,7 @@ alias buntar='tar -xjvf'
 alias open='xdg-open'
 alias ...="cd ../.."
 alias gof="open ."
+alias scls="screen -ls"
 
 alias t='task'
 

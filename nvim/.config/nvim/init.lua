@@ -74,8 +74,9 @@ require('packer').startup(function()
   }
   use {
     "iamcco/markdown-preview.nvim",
-    ft = "markdown",
-    run = "cd app && yarn install",
+    run = "cd app && npm install",
+    setup = function() vim.g.mkdp_filetypes = { "markdown" } end,
+    ft = { "markdown" },
   }
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   use { 'nvim-treesitter/playground' }
@@ -92,8 +93,7 @@ require('packer').startup(function()
 
   use 'nvim-orgmode/orgmode'
 
-  -- use 'ekickx/clipboard-image.nvim'
-  use '~/perso/clipboard-image.nvim'
+  use 'ekickx/clipboard-image.nvim'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'saadparwaiz1/cmp_luasnip'
   use 'L3MON4D3/LuaSnip'
@@ -332,6 +332,7 @@ null_ls.setup {
     null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.isort,
     null_ls.builtins.diagnostics.flake8,
+    null_ls.builtins.diagnostics.rpmspec,
   },
   on_attach = on_attach,
 }
@@ -377,8 +378,8 @@ local lsp_settings = {
     cmd = { "vscode-json-languageserver", "--stdio" },
   },
   sumneko_lua = {
-    -- cmd = {"/home/vandal/programs/lua-language-server/bin/lua-language-server", "-E", "/home/vandal/programs/lua-language-server/bin/main.lua"},
-    cmd = { "lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua" },
+    cmd = { "/home/vandal/programs/lua-language-server/bin/lua-language-server", "-E", "/home/vandal/programs/lua-language-server/bin/main.lua" },
+    -- cmd = { "lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua" },
     settings = {
       Lua = {
         runtime = {
@@ -411,15 +412,16 @@ local lsp_settings = {
           forwardSearchAfter = true,
           onSave = true,
           -- args = { "-pdf", "-pdflatex=xelatex", "-interaction=nonstopmode", "-synctex=1", "-pvc", "%f" },
-          args = { "-pdf", "-pdflatex=xelatex", "-interaction=nonstopmode", "-synctex=1", "%f" },
+          args = { "-pdf", "-pdflatex=pdflatex", "-interaction=nonstopmode", "-synctex=1", "%f" },
           -- args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
         },
         forwardSearch = {
           -- executable = "okular",
           -- args = {"--unique", "file:%p#src:%l%f"},
-          executable = "zathura",
-          args = { '--synctex-forward', '%l:1:%f', '%p' },
-          -- executable =  "evince-synctex",
+          -- executable = "zathura",
+          -- args = { '--synctex-forward', '%l:1:%f', '%p' },
+          executable =  "evince-synctex",
+          args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
           -- args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
           onSave = true,
         }
@@ -580,7 +582,7 @@ require 'nvim-treesitter.configs'.setup {
   highlight = {
     enable = true,
     -- disable = {'org'}, -- Remove this to use TS highlighter for some of the highlights (Experimental)
-    disable = {'html'},
+    disable = { 'html' },
     additional_vim_regex_highlighting = { 'org' }, -- Required since TS highlighter doesn't support all syntax features (conceal)
   },
   incremental_selection = {
@@ -594,7 +596,7 @@ require 'nvim-treesitter.configs'.setup {
   },
   indent = {
     enable = true,
-    disable = { "python", "html"},
+    disable = { "python", "html" },
   },
   -- From https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   textobjects = {
@@ -780,7 +782,7 @@ dap.configurations.python = {
     -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
 
     program = "${file}"; -- This configuration will launch the current file if used.
-    justMyCode=false;
+    justMyCode = false;
     pythonPath = function()
       local venv_path = os.getenv("VIRTUAL_ENV")
       if venv_path then
@@ -846,9 +848,9 @@ require("fidget").setup()
 
 vim.api.nvim_set_keymap('n', '<leader>mp', '<Plug>MarkdownPreviewToggle', { silent = true })
 
-require'clipboard-image'.setup {
+require 'clipboard-image'.setup {
   default = {
-   img_dir = {"%:p:h", "img"}
+    img_dir = { "%:p:h", "img" }
   },
 }
 vim.keymap.set('n', '<leader>ip', require('clipboard-image.paste').paste_img)
@@ -945,11 +947,56 @@ vim.api.nvim_set_keymap('n', '<leader>ro', '<Plug>(IPy-RunOp)', { silent = true 
 
 -- Setup iron (sometimes more convenient to have REPL in nvim directly)
 -- Last command also requires hydrogen text object
+local iron = require("iron.core")
+iron.setup {
+  config = {
+    highlight_last = false,
+    should_map_plug = false,
+    repl_definition = {
+      python = require("iron.fts.python").ipython,
+      nirps = {
+        command = {"ssh", "pmaestria", "conda", "activate", "nirps-comm;", "ipython"}
+      }
+    },
+    repl_open_cmd = 'topleft vertical 88 split',
+  },
+  keymaps = {
+    send_motion = "<leader>sc",
+    visual_send = "<leader>sc",
+    send_line = "<leader>sl",
+    cr = "<leader>s<cr>",
+    interrupt = "<leader>s<leader>",
+    exit = "<leader>sq",
+    clear = "<leader>cl",
+  }
+}
+
+-- local function open_custom_repl()
+--   local repl_name = vim.fn.input("Enter repl: ")
+--   _G.current_repl = repl_name
+--   vim.cmd([[:IronRepl ]] .. repl_name)
+-- end
+--
+-- local function get_current_repl()
+--   if current_repl then
+--     return current_repl
+--   else
+--     return ""
+--   end
+-- end
+--
+-- local function wrap_iron_command(iron_cmd)
+--   vim.cmd([[:]] .. iron_cmd .. [[ ]] .. get_current_repl())
+-- end
+
+-- vim.keymap.set('n', '<leader>ir', function() wrap_iron_command("IronRepl") end, {})
+-- vim.keymap.set("n", "<leader>ic", open_custom_repl, {noremap = true, silent = false})
+-- vim.keymap.set('n', '<leader>if', function() wrap_iron_command("IronFocus") end, {})
 vim.api.nvim_set_keymap('n', '<leader>ir', ':IronRepl<CR>', {})
+vim.api.nvim_set_keymap('n', '<leader>is', ':IronRestart<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>if', ':IronFocus<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>is', ':IronRestart<CR>', {})
-vim.api.nvim_set_keymap('n', '<leader>x', 'ctrahj]h', {})
-vim.g.iron_map_extended = 0
+vim.api.nvim_set_keymap('n', '<leader>x', '<leader>scahj]h', {})
 
 
 -- Firenvim (off by default, use shortcut to set for FF addon to activate)
