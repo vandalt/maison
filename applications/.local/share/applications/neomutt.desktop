@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Neomutt
 #Exec=al -T Neomutt -e neomutt
-Exec=kitty --class Neomutt -e neomutt
+Exec=kitty --class Neomutt -- neomutt
 Terminal=false
 Type=Application
-Keywords=mail;
-Icon=/home/vandal/Pictures/neomutt.png
+Keywords=mail;mutt;
+Icon=/home/vandal/Pictures/icons/neomutt.png

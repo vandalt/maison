@@ -6,6 +6,7 @@ named-mailboxes \
     '  Deleted' "=udem/Deleted Items" \
     '  Junk' "=udem/Junk Email" \
     '  McGill' "=udem/McGill" \
+    '  astro-ph' "=udem/astro-ph" \
     '  InitiaSciences' "=udem/InitiaSciences" \
     'Personal' "=personal/Inbox" \
     '  Drafts' "=personal/Drafts" \

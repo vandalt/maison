@@ -2,3 +2,4 @@ default-timeout=4000
 
 [mode=dnd]
 invisible=1
+default-timeout=0

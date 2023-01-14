@@ -2,7 +2,7 @@
 Name=Jupyter Lab
 Comment=Start Jupyter Lab server
 Exec=gnome-terminal --title "Jupyter Lab" --class jupyter-lab -- jupyter lab --port 8888
-Icon=/home/vandal/Pictures/jupyter-lab.svg
+Icon=/home/vandal/Pictures/icons/jupyter-lab.svg
 Type=Application
 Categories=Development;
 StartupNotify=true

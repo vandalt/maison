@@ -2,7 +2,7 @@
 Type=Application
 Name=nnn
 Comment=Terminal file manager
-Exec=alacritty --class nnn -e nnn
+Exec=kitty --class nnn -e nnn
 Terminal=false
 Icon=nnn
 MimeType=inode/directory

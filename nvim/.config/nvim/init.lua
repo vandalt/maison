@@ -14,6 +14,7 @@ vim.cmd [[packadd packer.nvim]]
 local use = require('packer').use
 require('packer').startup(function()
   use { 'wbthomason/packer.nvim', opt = true }
+  use 'lewis6991/impatient.nvim'
   use 'tpope/vim-surround'
   use 'tpope/vim-repeat'
   use {
@@ -24,6 +25,7 @@ require('packer').startup(function()
   use 'sindrets/diffview.nvim'
   use { 'TimUntersberger/neogit',
     requires = { 'nvim-lua/plenary.nvim', 'sindrets/diffview.nvim' },
+    commit = "1acb13c07b34622fe1054695afcecff537d9a00a",
   }
   use 'tpope/vim-rhubarb'
   if vim.fn.executable "gh" == 1 then
@@ -39,14 +41,21 @@ require('packer').startup(function()
   use 'tpope/vim-eunuch' -- Enhanced unix shell commands
   use 'tpope/vim-sleuth' -- heuristically set indentation
   use 'tpope/vim-vinegar' -- nicer file navigation
+  use {'prichrd/netrw.nvim', requires = {'kyazdani42/nvim-web-devicons'}}
   -- use 'github/copilot.vim'
   -- use 'axelf4/vim-strip-trailing-whitespace' -- Remove white spaces only on modified lines
   use 'szw/vim-maximizer'
   use "AndrewRadev/splitjoin.vim" -- Join and split lines with gS/gJ
   use 'justinmk/vim-gtfo' -- Go to terminal (got) or file manager (gof)
+  use 'ggandor/leap.nvim'
   use 'christoomey/vim-tmux-navigator'
   use 'tommcdo/vim-exchange' -- Exchange text objects with cx/cxx
   use 'vim-scripts/ReplaceWithRegister' -- Replace text object with gr
+  use { "Pocco81/true-zen.nvim",
+    config = function()
+      require("true-zen").setup { }
+  end,
+  }
   use 'KenN7/vim-arsync' -- Sync remote files with rsync
   use {
     'nvim-lualine/lualine.nvim',
@@ -79,10 +88,14 @@ require('packer').startup(function()
     setup = function() vim.g.mkdp_filetypes = { "markdown" } end,
     ft = { "markdown" },
   }
+  use { 'rbonvall/vim-textobj-latex', requires = 'kana/vim-textobj-user' }
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   use { 'nvim-treesitter/playground' }
   use 'nvim-treesitter/nvim-treesitter-textobjects'
   use 'neovim/nvim-lspconfig'
+  -- use "ray-x/lsp_signature.nvim"
+  -- use "barreiroleo/ltex-extra.nvim"
+  use "~/repos/ltex_extra.nvim/"
   use {
     'j-hui/fidget.nvim',
   }
@@ -99,6 +112,7 @@ require('packer').startup(function()
   use 'ekickx/clipboard-image.nvim'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-path'
+  -- use 'hrsh7th/cmp-copilot'
   use 'saadparwaiz1/cmp_luasnip'
   use 'L3MON4D3/LuaSnip'
   use 'rafamadriz/friendly-snippets'
@@ -116,18 +130,68 @@ require('packer').startup(function()
       'nvim-telescope/telescope-dap.nvim',
     }
   }
+  use 'nvim-telescope/telescope-ui-select.nvim' 
   use 'goerz/jupytext.vim' -- Convert and open jupyter notebooks
   use { 'bfredl/nvim-ipy', run = ':UpdateRemotePlugins' }
   use 'hkupty/iron.nvim'
   use 'jpalardy/vim-slime'
-  use { 'GCBallesteros/vim-textobj-hydrogen', requires = 'kana/vim-textobj-user' }
+  use {
+    -- 'GCBallesteros/vim-textobj-hydrogen',
+    '~/repos/vim-textobj-hydrogen',
+    requires = 'kana/vim-textobj-user' 
+  }
   use 'akinsho/nvim-toggleterm.lua'
+  use {
+      -- Highlight cursor-word like an IDE.
+      'nyngwang/murmur.lua',
+      config = function ()
+        require('murmur').setup {
+          -- cursor_rgb = 'purple', -- default to '#393939'
+          max_len = 80, -- maximum word-length to highlight
+          -- min_len = 3,
+          -- disable_on_lines = 2000, -- to prevent lagging on large files. Default to 2000 lines.
+          exclude_filetypes = {},
+          callbacks = {
+            -- to trigger the close_events of vim.diagnostic.open_float.
+            function ()
+              -- Close floating diag. and make it triggerable again.
+              vim.cmd('doautocmd InsertEnter')
+              vim.w.diag_shown = false
+            end,
+          }
+        }
+        vim.api.nvim_create_autocmd('CursorHold', {
+          group = FOO,
+          pattern = '*',
+          callback = function ()
+            -- skip when a float-win already exists.
+            if vim.w.diag_shown then return end
+
+            -- open float-win when hovering on a cursor-word.
+            if vim.w.cursor_word ~= '' then
+              vim.diagnostic.open_float(nil, {
+                focusable = false,
+                close_events = { 'InsertEnter' },
+                border = 'rounded',
+                source = 'always',
+                prefix = ' ',
+                scope = 'cursor',
+              })
+              vim.w.diag_shown = true
+            end
+          end
+        })
+      end
+    }
   use 'folke/tokyonight.nvim'
+  use 'shaunsingh/nord.nvim'
   use {
     'glacambre/firenvim',
     run = function() vim.fn['firenvim#install'](0) end
   }
 end)
+
+require('impatient')
 
 -- Window options
 vim.o.mouse = "a"
@@ -186,27 +250,36 @@ vim.api.nvim_exec([[
   augroup end
 ]], false)
 
+
+vim.api.nvim_create_user_command("Cppath", function()
+    local path = vim.fn.expand("%:p")
+    vim.fn.setreg("+", path)
+    vim.notify('Copied "' .. path .. '" to the clipboard!')
+end, {}) 
+
 -- Colors
 vim.cmd [[syntax enable]]
 -- vim.g.gruvbox_italic = 1
 vim.o.termguicolors = true
+-- vim.g.nord_bold = false
+-- require('nord').set()
 require("tokyonight").setup({
   style = "night",
-  transparent = true,
+  -- style = "day",
+  -- transparent = true,
 })
 vim.cmd [[colorscheme tokyonight]]
 
 -- Function with a few defaults to write prose (Global so can call in editor)
-function Prose(bufnr)
+function Prose()
 
   local function map(mode, l, r, opts)
     opts = opts or {}
-    opts.buffer = bufnr
     vim.keymap.set(mode, l, r, opts)
   end
 
-  map('n', '<leader>ap', 'vasgq', { noremap = true }) -- Line to paragraph
-  map('n', '<leader>al', 'vipJ', { noremap = true }) -- Paragraph to line
+  map('n', '<leader>ap', 'vasgq', { noremap = true, buffer = true }) -- Line to paragraph
+  map('n', '<leader>al', 'vipJ', { noremap = true, buffer = true }) -- Paragraph to line
   -- vim.bo.textwidth = 80
   -- vim.bo.formatoptions = vim.bo.formatoptions .. 't' -- Wrap on width
   -- vim.wo.linebreak = true
@@ -218,14 +291,14 @@ function Prose(bufnr)
   -- vim.bo.smartindent = false
   -- vim.bo.indentexpr = ''
   vim.wo.colorcolumn = ''
-  map('n', 'j', 'gj', { noremap = true })
-  map('n', 'k', 'gk', { noremap = true })
-  map('v', 'j', 'gj', { noremap = true })
-  map('v', 'k', 'gk', { noremap = true })
+  map({'n', 'v'}, 'j', 'gj', { noremap = true, buffer = true })
+  map({'n', 'v'}, 'gj', 'j', { noremap = true, buffer = true })
+  map({'n', 'v'}, 'k', 'gk', { noremap = true, buffer = true })
+  map({'n', 'v'}, 'gk', 'k', { noremap = true, buffer = true })
 end
 
 -- vim.cmd [[autocmd FileType tex,plaintex lua Prose()]]
-vim.cmd [[autocmd BufNewFile,BufRead *.md,*.txt lua Prose()]]
+vim.cmd [[autocmd BufNewFile,BufRead *.md,*.txt,*.tex lua Prose()]]
 
 
 -- Mappings
@@ -240,12 +313,14 @@ vim.api.nvim_set_keymap("n", "<M-\\>", ":TmuxNavigatePrevious<CR>", { noremap = 
 
 -- Écriture inclusive
 vim.api.nvim_set_keymap("i", "<M-.>", "<C-v>u00b7", { noremap = true })
+vim.api.nvim_set_keymap("i", "<M-d>", "📅", { noremap = true })
+vim.api.nvim_set_keymap("i", "<M-u>", "μ", { noremap = true })
 
 -- Size windows
 vim.api.nvim_set_keymap('n', '<leader>=', '<C-w>=', { noremap = true })
 vim.api.nvim_set_keymap('n', '<M-,>', '<C-w><', { noremap = true })
 vim.api.nvim_set_keymap('n', '<M-.>', '<C-w>>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<M-S-=>', '<C-w>+', { noremap = true })
+vim.api.nvim_set_keymap('n', '<M-=>', '<C-w>+', { noremap = true })
 vim.api.nvim_set_keymap('n', '<M-->', '<C-w>-', { noremap = true })
 
 -- Edit and load config
@@ -255,6 +330,8 @@ vim.api.nvim_set_keymap('n', '<leader>lv', ':luafile $MYVIMRC<CR>', { noremap = 
 -- Navigate
 -- vim.api.nvim_set_keymap('n', '<leader>v', '<Plug>VinegarUp', { noremap = true })
 
+vim.keymap.set('i', '<C-f>', '<C-k>', { noremap = true })
+
 -- Move line in up or down file
 vim.api.nvim_set_keymap('n', '<C-j>', ':m .+1<CR>==', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-k>', ':m .-2<CR>==', { noremap = true })
@@ -262,6 +339,8 @@ vim.api.nvim_set_keymap('i', '<C-j>', '<Esc>:m .+1<CR>==gi', { noremap = true })
 vim.api.nvim_set_keymap('i', '<C-k>', '<Esc>:m .-2<CR>==gi', { noremap = true })
 vim.api.nvim_set_keymap('v', '<C-j>', ':m \'>+1<CR>gv=gv', { noremap = true })
 vim.api.nvim_set_keymap('v', '<C-k>', ':m \'<-2<CR>gv=gv', { noremap = true })
+
+-- vim.api.nvim_set_keymap('i', '<C-f>', 'i_digraph', { noremap = true })
 
 -- Switch 0 and ^ (we can use _ instead of ^ to avoid a recursive mapping)
 vim.api.nvim_set_keymap("n", "0", "_", {})
@@ -293,40 +372,47 @@ vim.api.nvim_set_keymap('n', '<leader>pl', ':PackerClean<CR>', { noremap = true 
 
 
 ---- Add additional capabilities supported by nvim-cmp
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+-- local capabilities = vim.lsp.protocol.make_client_capabilities()
+-- capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 
+-- require "lsp_signature".setup {}
 
 -- LSP settings
 local lspconfig = require 'lspconfig'
+
+local opts = { noremap=true, silent=true }
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
+vim.keymap.set('n', '<leader>Q', vim.diagnostic.setqflist, opts)
+
 local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-  local opts = { noremap = true, silent = true }
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'i', '<C-s>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ls', [[<cmd>lua require('telescope.builtin').lsp_references()<cr>]], opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>Q', '<cmd>lua vim.diagnostic.setqflist()<CR>', opts)
+  local bufopts = { noremap = true, silent = true, buffer=bufnr }
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+  vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help, bufopts)
+  vim.keymap.set('n', '<leader>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+  vim.keymap.set('n', '<leader>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, bufopts)
+  vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, bufopts)
+  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+  vim.keymap.set('n', '<leader>ls', [[<cmd>lua require('telescope.builtin').lsp_references()<cr>]], bufopts)
+  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+  vim.keymap.set({'n', 'v'}, '<space>sf', function() vim.lsp.buf.format { async = true } end, bufopts)
 
-  if client.server_capabilities.document_formatting then
-    vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>sf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-    vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
-  end
+  -- if client.server_capabilities.document_formatting then
+  --   vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>sf", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  --   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
+  -- end
   if client.server_capabilities.document_range_formatting then
-    vim.api.nvim_buf_set_keymap(bufnr, "v", "<leader>sf", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
     FormatRange = function()
       local start_pos = vim.api.nvim_buf_get_mark(0, '<')
       local end_pos = vim.api.nvim_buf_get_mark(0, '>')
@@ -346,7 +432,7 @@ null_ls.setup {
     null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.isort,
     null_ls.builtins.diagnostics.flake8.with({
-      args = { "--ignore", "E501,W503,E203,E402,E722", "--format", "default", "--stdin-display-name", "$FILENAME", "-" }
+      args = { "--ignore", "E501,W503,E203,E402,E722,E111,E114,E226", "--format", "default", "--stdin-display-name", "$FILENAME", "-" }
     }),
     null_ls.builtins.diagnostics.rpmspec,
   },
@@ -359,6 +445,18 @@ local runtime_path = vim.split(package.path, ';')
 table.insert(runtime_path, 'lua/?.lua')
 table.insert(runtime_path, 'lua/?/init.lua')
 
+-- HACK: This workaround disables ltex in settings, but not actual LSP
+-- works to supprress error messages, which is what I needed
+local function get_enable_ltex()
+  -- local filename = vim.api.nvim_buf_get_name(0)
+  local filename = vim.fn.getcwd()
+  if string.match(filename, "notes") then
+    return false
+  end
+  return {"bibtex", "context", "context.tex", "html", "latex", "markdown", "org", "restructuredtext", "rsweave", "mail"}
+end
+local enable_ltex = get_enable_ltex()
+
 -- List of all servers
 local servers = {
   'sumneko_lua',
@@ -369,9 +467,42 @@ local servers = {
   'texlab',
   'jsonls',
   'ccls',
+  'ltex',
+  'fortls',
 }
 -- Table with custom settings when required
 local lsp_settings = {
+  ltex = {
+    cmd = { "/home/vandal/programs/ltex-ls-15.2.0/bin/ltex-ls" },
+    root_dir = function(filename, bufnr)
+      -- Disable LSP for files in notes directory
+      if string.match(filename, "notes") then
+        print("Done")
+        return nil
+      end
+      print("NOT DONE")
+      return require("lspconfig.server_configurations.ltex").default_config.root_dir(filename, bufnr)
+    end,
+    on_attach = function(client, bufnr)
+      on_attach(client, bufnr)
+      require("ltex_extra").setup{
+          load_langs = { "fr", "en-US" },
+          init_check = true,
+          path = "/home/vandal/.local/share/ltex",
+          log_level = "warn",
+      }
+    end,
+    -- filetypes = { "bib", "gitcommit", "markdown", "org", "plaintex", "rst", "rnoweb", "tex", "mail" },
+    filetypes = { "bib", "gitcommit", "markdown", "org", "plaintex", "rst", "rnoweb", "tex", "mail" },
+    -- NOTE: ltex_extra crashes if no settings set,so using this one to fix
+    settings = {
+      ltex = {
+        -- Set enabled to false if full path of current file contains "notes"
+        enabled = enable_ltex,
+        -- enabled = {"bibtex", "context", "context.tex", "html", "latex", "markdown", "org", "restructuredtext", "rsweave", "mail"}
+      },
+    }
+  },
   bashls = {
     cmd_env = {
       GLOB_PATTERN = "*@(.sh|.inc|.bash|.command|.zsh)"
@@ -382,20 +513,23 @@ local lsp_settings = {
     settings = {
       python = {
         analysis = {
-          typeCheckingMode = "off";
+          typeCheckingMode = "off",
+          autoSearchPaths = true,
+          useLibraryCodeForTypes = true,
+          -- diagnosticMode = 'openFilesOnly',
         }
       }
     }
   },
   cssls = {
-    cmd = { "vscode-css-languageserver", "--stdio" },
+    cmd = { "vscode-css-language-server", "--stdio" },
   },
   jsonls = {
-    cmd = { "vscode-json-languageserver", "--stdio" },
+    cmd = { "vscode-json-language-server", "--stdio" },
   },
   sumneko_lua = {
-    -- cmd = { "/home/vandal/programs/lua-language-server/bin/lua-language-server", "-E", "/home/vandal/programs/lua-language-server/bin/main.lua" },
-    cmd = { "lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua" },
+    cmd = { "/home/vandal/programs/lua-language-server/bin/lua-language-server", "-E", "/home/vandal/programs/lua-language-server/bin/main.lua" },
+    -- cmd = { "lua-language-server", "-E", "/usr/lib/lua-language-server/main.lua" },
     settings = {
       Lua = {
         runtime = {
@@ -424,21 +558,22 @@ local lsp_settings = {
   texlab = {
     settings = {
       texlab = {
+        bibtexFormatter = "latexindent",
         build = {
-          forwardSearchAfter = true,
+          forwardSearchAfter = false,
           onSave = true,
-          -- args = { "-pdf", "-pdflatex=xelatex", "-interaction=nonstopmode", "-synctex=1", "-pvc", "%f" },
-          -- args = { "-pdf", "-pdflatex=lualatex", "-interaction=nonstopmode", "-synctex=1", "-pvc", "%f" },
+          -- args = { "-pdf", "-pdflatex=xelatex", "-interaction=nonstopmode", "-synctex=1", "%f" },
+          -- args = { "-pdf", "-pdflatex=lualatex", "-interaction=nonstopmode", "-synctex=1", "%f" },
           args = { "-pdf", "-pdflatex=pdflatex", "-interaction=nonstopmode", "-synctex=1", "%f" },
           -- args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
         },
         forwardSearch = {
-          executable = "okular",
-          args = {"--unique", "file:%p#src:%l%f"},
-          -- executable = "zathura",
-          -- args = { '--synctex-forward', '%l:1:%f', '%p' },
+          -- executable = "okular",
+          -- args = {"--unique", "file:%p#src:%l%f"},
+          executable = "zathura",
+          args = { '--synctex-forward', '%l:1:%f', '%p' },
           -- executable =  "evince-synctex",
-          -- args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
+          -- args =  {"-f", "%l", "%p", "\"code -g %f:%l\""},
           -- args =  {"-f", "%l", "%p", '"nvr --remote-silent %f -c %l --servername /tmp/texsocket"'},
           onSave = true,
         }
@@ -523,15 +658,19 @@ end
 require('lualine').setup {
   options = {
     icons_enabled = true,
-    -- theme = "tokyonight",
+    theme = "tokyonight",
     component_separators = '|',
     section_separators = '',
   },
   sections = {
     lualine_b = { 'branch', 'filename', 'diagnostics' },
-    -- lualine_c = { function()
-    --   return vim.fn['nvim_treesitter#statusline'](90)
-    -- end },
+    lualine_c = { function()
+      local ts_status = vim.fn['nvim_treesitter#statusline']()
+      if ts_status == vim.NIL then
+        ts_status = ""
+      end
+      return ts_status
+    end },
   },
 }
 
@@ -595,13 +734,31 @@ function get_date_zw()
   end
 end
 
+function create_reading_tbl()
+  local author = vim.fn.input('Author: ')
+  local year = vim.fn.input('Year: ')
+  local readingid = vim.fn.input('Reading ID: ')
+
+  local title = table.concat({author, year, readingid}, " ")
+
+  local zk_tbl = {title = title, dir = "readings", extra = {author=author, year=year, readingid=readingid}}
+  -- NOTE: This would be the code to return str with table info instead, keeping in case
+  -- local reading_str = vim.inspect(zk_tbl, {newline = " ", indent=""})
+  -- return reading_str
+  return zk_tbl
+end
+
 local zk_opts = { noremap = true, silent = false }
 -- Create a new note after asking for its title.
 vim.api.nvim_set_keymap("n", "<leader>zn", "<Cmd>ZkNew { title = vim.fn.input('Title: '), dir = vim.fn.input('Dir: ', '', 'dir') }<CR>", zk_opts)
-vim.api.nvim_set_keymap("n", "<leader>zj", "<Cmd>ZkNew { dir = 'journal' }<CR>", zk_opts)
-vim.api.nvim_set_keymap("n", "<leader>zw", "<Cmd>ZkNew { dir = 'journal/weekly', date = get_date_zw() }<CR>", zk_opts)
-vim.api.nvim_set_keymap("n", "<leader>zd", "<Cmd>ZkNew { dir = 'journal/daily' }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zd", "<Cmd>ZkNew { dir = 'daily' }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zz", "<Cmd>ZkNew { title = vim.fn.input('Title: '), dir = 'zettel' }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zr", "<Cmd>ZkNew create_reading_tbl()<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zw", "<Cmd>ZkNew { dir = 'weekly', date = get_date_zw() }<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>zk", "<Cmd>ZkNew { title = 'backlog' }<CR>", zk_opts)
 vim.api.nvim_set_keymap("v", "<leader>zn", ":'<,'>ZkNewFromTitleSelection { dir = vim.fn.input('Dir: ', '', 'dir') }<CR>", zk_opts)
+vim.api.nvim_set_keymap("v", "<leader>zz", ":'<,'>ZkNewFromTitleSelection { dir = 'zettel' }<CR>", zk_opts)
+vim.api.nvim_set_keymap("v", "<leader>zr", ":'<,'>ZkNewFromTitleSelection create_reading_tbl()<CR>", zk_opts)
 -- Open notes.
 vim.api.nvim_set_keymap("n", "<leader>zo", "<Cmd>ZkNotes<CR>", zk_opts)
 -- Index notes
@@ -612,6 +769,7 @@ vim.api.nvim_set_keymap("n", "<leader>zt", "<Cmd>ZkTags<CR>", zk_opts)
 vim.api.nvim_set_keymap("n", "<leader>zf", "<Cmd>ZkNotes { match = vim.fn.input('Search: ') }<CR>", zk_opts)
 -- Search links
 vim.api.nvim_set_keymap("n", "<leader>zl", "<Cmd>ZkLinks<CR>", zk_opts)
+vim.api.nvim_set_keymap("n", "<leader>za", "<Cmd>Move archive/<CR>", zk_opts)
 vim.api.nvim_set_keymap("n", "<leader>zb", "<Cmd>ZkBacklinks<CR>", zk_opts)
 -- Search for the notes matching the current visual selection.
 vim.api.nvim_set_keymap("v", "<leader>zf", ":'<,'>ZkMatch<CR>", zk_opts)
@@ -621,6 +779,7 @@ require 'nvim-treesitter.configs'.setup {
   ensure_installed = {
     "python",
     "bash",
+    "fortran",
     "c",
     "lua",
     "rust",
@@ -661,8 +820,8 @@ require 'nvim-treesitter.configs'.setup {
         -- You can use the capture groups defined in textobjects.scm
         ["af"] = "@function.outer",
         ["if"] = "@function.inner",
-        ["ac"] = "@class.outer",
-        ["ic"] = "@class.inner",
+        ["ao"] = "@class.outer",
+        ["io"] = "@class.inner",
         ["aa"] = "@parameter.outer",
         ["ia"] = "@parameter.inner",
       },
@@ -701,7 +860,7 @@ require 'nvim-treesitter.configs'.setup {
 
 -- LuaSnip setup
 local luasnip = require 'luasnip'
-require("luasnip.loaders.from_vscode").load()
+require("luasnip.loaders.from_vscode").lazy_load()
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
@@ -714,7 +873,7 @@ cmp.setup {
   mapping = {
     ['<C-p>'] = cmp.mapping.select_prev_item(),
     ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete({}),
     ['<C-e>'] = cmp.mapping.close(),
@@ -724,7 +883,7 @@ cmp.setup {
       select = true,
     },
     -- Does not replace after, makes zk+cmp+autopairs work
-    ['<CR>'] = cmp.mapping.confirm { select = true },
+    ['<CR>'] = cmp.mapping.confirm { select = false },
     ['<Tab>'] = function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -748,6 +907,7 @@ cmp.setup {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
     { name = 'path' },
+    -- { name = 'copilot' },
   },
 }
 
@@ -755,7 +915,7 @@ cmp.setup {
 vim.keymap.set('n', '<leader>lr', ':LspRestart<CR>', { silent = true })
 vim.keymap.set('n', '<leader>li', ':LspInfo<CR>', { silent = true })
 vim.keymap.set('n', '<leader>ll', ':LspStart<CR>', { silent = true }) -- "launch"
-vim.keymap.set('n', '<leader>lt', ':LspStop<CR>', { silent = true })
+vim.keymap.set('n', '<leader>lt', ':LspStop ', { silent = false })
 
 -- Doge mapping
 vim.g.doge_mapping = '<leader>ld'
@@ -787,6 +947,21 @@ dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
   command = '/home/vandal/programs/cpptools/extension/debugAdapters/bin/OpenDebugAD7',
+}
+dap.configurations.fortran = {
+  {
+    name = "Launch file",
+    type = "cppdbg",
+    request = "launch",
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+    cwd = '${workspaceFolder}',
+    stopOnEntry = true,
+    args = function()
+      return {vim.fn.input('Arguments: ', '', 'file'),}
+    end,
+  },
 }
 dap.configurations.cpp = {
   {
@@ -895,6 +1070,16 @@ require("fidget").setup()
 
 vim.api.nvim_set_keymap('n', '<leader>mp', '<Plug>MarkdownPreviewToggle', { silent = true })
 
+-- TODO: Rewrite in lua
+vim.cmd(
+[[
+function OpenMarkdownPreview (url)
+  execute "silent ! firefox --new-window " . a:url
+endfunction
+]]
+)
+vim.g.mkdp_browserfunc = 'OpenMarkdownPreview'
+
 require 'clipboard-image'.setup {
   default = {
     img_dir = { "%:p:h", "img" }
@@ -917,8 +1102,17 @@ require('gitsigns').setup {
     end
 
     -- Navigation
-    map('n', ']c', "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'", { expr = true })
-    map('n', '[c', "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'", { expr = true })
+    map('n', ']h', function()
+      if vim.wo.diff then return ']c' end
+      vim.schedule(function() gs.next_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
+
+    map('n', '[h', function()
+      if vim.wo.diff then return '[c' end
+      vim.schedule(function() gs.prev_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
 
     -- Actions
     map({ 'n', 'v' }, '<leader>hs', ':Gitsigns stage_hunk<CR>')
@@ -944,7 +1138,7 @@ vim.g.jupytext_fmt = 'py:percent'
 
 require('toggleterm').setup {
   open_mapping = [[<A-\>]],
-  start_in_insert = true,
+  start_in_insert = false,
 }
 
 -- Run a python file in terminal (opens one if none opened)
@@ -1066,7 +1260,8 @@ vim.keymap.set("n", "<leader>ic", open_custom_repl, {noremap = true, silent = fa
 vim.api.nvim_set_keymap('n', '<leader>is', ':IronRestart<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>if', ':IronFocus<CR>', {})
 vim.api.nvim_set_keymap('n', '<leader>is', ':IronRestart<CR>', {})
-vim.api.nvim_set_keymap('n', '<leader>x', '<leader>scahj]h', {})
+vim.api.nvim_set_keymap('n', '<leader>cc', '<leader>scacj]c', {})
+vim.api.nvim_set_keymap('n', '<leader>cs', '<leader>scac', {})
 
 
 -- Firenvim (off by default, use shortcut to set for FF addon to activate)
@@ -1100,6 +1295,7 @@ telescope.setup {
   }
 }
 -- telescope.load_extension('dap')
+telescope.load_extension("ui-select")
 
 -- built-in telescope mappings
 vim.keymap.set('n', '<leader>ff', function() require('telescope.builtin').find_files() end)
@@ -1108,6 +1304,7 @@ vim.keymap.set('n', '<leader>fb', function() require('telescope.builtin').buffer
 vim.keymap.set('n', '<leader>fh', function() require('telescope.builtin').help_tags() end)
 vim.keymap.set('n', '<leader>fi', function() require('telescope.builtin').symbols() end)
 vim.keymap.set('n', '<leader>fz', function() require('telescope.builtin').current_buffer_fuzzy_find() end)
+vim.keymap.set('n', 'z=', function() require('telescope.builtin').spell_suggest() end)
 vim.keymap.set('n', '<leader>gc', function() require('telescope.builtin').git_commits() end)
 vim.keymap.set('n', '<leader>gb', function() require('telescope.builtin').git_branches() end)
 vim.keymap.set('n', '<leader>gs', function() require('telescope.builtin').git_status() end)
@@ -1133,3 +1330,15 @@ vim.api.nvim_set_keymap('n', '<leader>gB', '<cmd>lua require"gitlinker".get_repo
 vim.api.nvim_set_keymap("n", "<leader>su", ":ARsyncUp<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>sk", ":ARsyncUpDelete<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>sd", ":ARsyncDown<CR>", { noremap = true })
+
+
+require'netrw'.setup{}
+
+leap = require('leap')
+leap.add_default_mappings()
+leap.opts.highlight_unlabeled_phase_one_targets = true
+-- leap.init_highlight(true)
+--
+
+-- Colorblind-friendly Leap labels
+vim.api.nvim_set_hl(0, "LeapLabelPrimary", {fg = "#9dcd6a"})

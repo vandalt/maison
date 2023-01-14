@@ -44,7 +44,7 @@ import subprocess
 # encryption and decryption pipes you prefer. They should read from standard
 # input and write to standard output. The example values here invoke GPG,
 # although won't work until an appropriate identity appears in the first line.
-ENCRYPTION_PIPE = ['gpg', '--encrypt', '--recipient', '35D75FCB6B4129A489539332C7F39EB04BCE9810']
+ENCRYPTION_PIPE = ['gpg', '--encrypt', '--recipient', '8A09B6EB026F61A7263CE7EEC35FDF29CC4E8B83']
 DECRYPTION_PIPE = ['gpg', '--decrypt']
 
 registrations = {

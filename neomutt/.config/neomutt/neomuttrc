@@ -24,6 +24,7 @@ set delete  # Don't ask before deleting
 unset confirmappend  # Don't ask before appending/moving
 set quit  # Don't ask before quitting
 set help = no  # Don't show the help bar (comment out if needed)
+set ask_cc = yes
 # set sort = reverse-date-received  # Latest messages on top
 # set sort = reverse-date-received  # Latest messages on top
 set sort=threads
@@ -38,7 +39,7 @@ set sidebar_delim_chars="/"  # Delimiter for splits in mailboxes
 set sidebar_indent_string="  "  # Indent for folders
 
 # Notifications
-set new_mail_command="notify-send --icon='/home/vandal/Pictures/neomutt.png' \
+set new_mail_command="notify-send --hint int:transient:1 --icon='/home/vandal/Pictures/icons/neomutt.png' \
 'New Email.' 'You have new mail.' &"
 
 ### Reading messages
@@ -90,7 +91,7 @@ bind index,pager N search-opposite
 
 ## Macros
 # Sync mailboxes now
-macro index S "!mbsync -qa &<enter>" "Update through mbsync"
+macro index S "!mailsync &<enter>" "Update through mbsync"
 macro attach s <save-entry><bol><delete-char><delete-char>/home/vandal/Downloads/<eol> "Save to Downloads"
 
 # Save message somewhere else
