@@ -43,7 +43,8 @@ def on_metadata(player, metadata, manager):
 
     if player.props.status != 'Playing' and track_info:
         track_info = ' ' + track_info
-    write_output(track_info, player)
+    if not track_info.endswith("None - None"):
+        write_output(track_info, player)
 
 
 def on_player_appeared(manager, player, selected_player=None):

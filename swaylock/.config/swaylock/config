@@ -4,4 +4,4 @@ ignore-empty-password
 indicator
 clock
 timestr=%H:%M
-effect-vignette=0.3:0.3
+effect-vignette=0.2:0.2

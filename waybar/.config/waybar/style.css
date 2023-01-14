@@ -4,7 +4,8 @@
     border: none;
     border-radius: 0;
     /* `otf-font-awesome` is required to be installed for icons */
-    font-family: "RobotoMono Nerd Font", "Roboto Mono", sans-serif;
+    /* font-family: "RobotoMono Nerd Font", "Roboto Mono", sans-serif; */
+    font-family: "VictorMono Nerd Font", "Victor Mono", sans-serif;
     /* For fedora put both fontawesome so 5 precedes 4 (the latter is needed by texlive) */
     /* Also, helvetica caused icons to not show properly*/
     /* font-family: Roboto, Arial, "Font Awesome 5 Free", "Font Awesome 5 Brands", "FontAwesome", "all-the-icon", "MesloLGS NF", sans-serif; */

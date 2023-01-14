@@ -1,3 +1,4 @@
+#!/usr/bin/zsh
 # Python
 alias p='ipython'
 # enable shared libraries (requied for some packages like theano)
@@ -5,14 +6,23 @@ alias spyenv='env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv'
 alias pup='python -m pip install -U pip'
 # Default venv config
 # alias nvenv='python -m venv venv'
-alias pact='source venv/bin/activate'
 
 # ipython updates somtimes break things, install only < IPYTHON_MAX_VERSION
-IPYTHON_MAX_VERSION=8
+# IPYTHON_MAX_VERSION=8
+
+# alias pact='source venv/bin/activate'
+
+pact() {
+  dirPrefix=$1
+  if [[ -z "$dirPrefix" ]]; then
+    dirPrefix="."
+  fi
+  source "$dirPrefix/venv/bin/activate"
+}
 
 pydefaults() {
   # Some default packages. In a function to access outside nvenv
-  python -m pip install -U "ipython < 8" ipdb ipykernel pyqt5 flake8 flake8-bugbear isort black
+  python -m pip install -U ipython ipdb ipykernel pyqt5 flake8 flake8-bugbear isort black
 }
 
 addipy() {

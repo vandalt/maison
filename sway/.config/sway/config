@@ -313,16 +313,12 @@ for_window [class="Toplevel"] floating enable
 #
     # Full screen
     bindsym --release Print exec $screenshot
-
     # Area
     bindsym --release Shift+Print exec $areashot
-
     # Full screen to clipboard
     bindsym --release Control+Print exec $screenclip
-
     # Area to clipboard
     bindsym --release Control+Shift+Print exec $areaclip
-
     # Colorpicker to clipboard
     bindsym --release $mod+Shift+o exec $colorpicker
 #

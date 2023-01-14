@@ -3,6 +3,9 @@
 ## make default editor Neovim
 export EDITOR=nvim
 
+# Added by Toolbox App
+export PATH="$PATH:/home/vandal/.local/share/JetBrains/Toolbox/scripts"
+
 #
 #eval $(gnome-keyring-daemon --start)
 #export SSH_AUTH_SOCK

@@ -25,18 +25,18 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 
-#source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
-#source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-#source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 function precmd () {
   echo -ne "\033]0;$(pwd | sed -e "s;^$HOME;~;")\a"
 }
 
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/doc/pkgfile/command-not-found.zsh
+# source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+# source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source /usr/share/doc/pkgfile/command-not-found.zsh
 
 setopt autocd
 
@@ -50,9 +50,9 @@ source ~/.zsh/python.zsh
 source ~/.zsh/onedrive.zsh
 
 # Must be after vi/emacs mode
-#source /usr/share/fzf/shell/key-bindings.zsh
-source /usr/share/fzf/key-bindings.zsh
-source /usr/share/fzf/completion.zsh
+source /usr/share/fzf/shell/key-bindings.zsh
+#source /usr/share/fzf/key-bindings.zsh
+#source /usr/share/fzf/completion.zsh
 
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -72,6 +72,7 @@ alias lla='ls -la'
 alias la='ls -a'
 alias lsd='ls -d'
 alias ltr='ls -ltr'
+alias treei='tree --gitignore'
 alias rmr='rm -rI'
 alias dh='du -sch *'
 alias dha='du -d 1 -h .'
@@ -82,6 +83,7 @@ alias open='xdg-open'
 alias ...="cd ../.."
 alias gof="open ."
 alias scls="screen -ls"
+alias slack="/usr/bin/slack --ozone-platform=wayland"
 
 alias t='task'
 
@@ -89,7 +91,7 @@ alias t='task'
 alias mutt='neomutt'
 
 # Mathematica wayland
-alias mathematica='QT_QPA_PLATFORM=xcb mathematica'
+# alias mathematica='QT_QPA_PLATFORM=xcb mathematica'
 
 # Clone and update AUR in aur dir
 alias auracle='auracle -C ~/aur'
@@ -102,21 +104,26 @@ alias vim='nvim'
 alias vimtex='NVIM_LISTEN_ADDRESS=/tmp/texsocket nvim'
 alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland'
 
+export NNN_PLUG='z:autojump;f:fzopen;x:xdgdefault'
+
+alias znv='z notes; nvim'
+
 # Notifications in sway
 # NOTE: No "toggle" for mako modes yet (https://github.com/emersion/mako/pull/382)
 alias dnd='makoctl set-mode do-not-disturb'
 alias dndoff='makoctl set-mode default'
 
 # Quick access to config files
-alias cnvim='nvim ~/.config/nvim/init.lua'
-alias csway='nvim ~/.config/sway/config'
+alias cnvim='z ~/.config/nvim; nvim init.lua; z -'
+alias cs='nvim ~/.config/sway/config'
+alias cterm='nvim ~/.config/kitty/kitty.conf'
 alias ctask='nvim ~/.config/task/taskrc'
 alias zshrc='nvim ~/.zshrc'
 
 # alias jwst-apt='~/programs/APT/APT'
 
 setopt +o nomatch
-alias texclean='rm *.aux *.fls *.fdb_latexmk *.log *.out *.vrb *.nav *.snm *.synctex.* *.toc'
+alias tclean='rm *.aux *.fls *.fdb_latexmk *.log *.out *.vrb *.nav *.snm *.synctex.* *.toc *.bbl *.blg *.lof'
 
 export THEANO_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
 # export XLA_FLAGS="--xla_force_host_platform_device_count=4"
@@ -132,11 +139,14 @@ export WEBBPSF_PATH=$HOME/Documents/data/package-data/webbpsf-data
 export PYSYN_CDBS=$HOME/Documents/data/package-data/trds
 export CRDS_PATH=$HOME/Documents/data/package-data/crds_cache
 export CRDS_SERVER_URL=https://jwst-crds.stsci.edu
+export MIRAGE_DATA=$HOME/Documents/data/package-data/mirage-data/mirage_data
+# Dsiable jupyter "frozen packges" warning for python 3.11
+export PYDEVD_DISABLE_FILE_VALIDATION=1
 
 # Kitty
 if [ $TERM = "xterm-kitty" ]; then
   LIGHT_COLOR='tokyonight_day.conf'
-  DARK_COLOR='tokyonight_night.conf'
+  DARK_COLOR='tokyonight_moon.conf'
 
   alias tday="cp ~/.config/kitty/themes/$LIGHT_COLOR ~/.config/kitty/theme.conf"
   alias tnight="cp ~/.config/kitty/themes/$DARK_COLOR ~/.config/kitty/theme.conf"
@@ -177,7 +187,7 @@ function csview {
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-JWST_TOKEN_FILE=~/projects/jwst-manage-data/latest_token.txt
+JWST_TOKEN_FILE=~/repos/jwst-manage-data/latest_token.txt
 if [[ -f "$JWST_TOKEN_FILE" ]]; then
   export MAST_API_TOKEN="$(cat $JWST_TOKEN_FILE)"
 fi
@@ -192,3 +202,8 @@ if command -v zoxide 1>/dev/null 2>&1; then
 fi
 
 alias luamake=/home/vandal/programs/lua-language-server/3rd/luamake/luamake
+
+alias mambaload="eval \"\$(/home/vandal/programs/mambaforge/bin/conda shell.zsh hook)\""
+
+# Enable intel oneapi compilers (not python)
+alias isource="source /opt/intel/oneapi/setvars.sh --config=\"/home/vandal/.zsh/intel_oneapi_config.txt\""
