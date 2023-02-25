@@ -24,3 +24,5 @@ Jupytext
 Roellig
 jwst
 isot
+NIRPS
+Luhman

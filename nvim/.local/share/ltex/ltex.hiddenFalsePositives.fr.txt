@@ -57,3 +57,4 @@
 {"rule":"J_N","sentence":"^\\QLe panneau du haut montre l'évolution du champ magnétique en fonction de la latitude et du temps à un rayon de 0.56 \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q (juste au-dessus de la base de la zone convective).\\E$"}
 {"rule":"J_N","sentence":"^\\QIl fut ensuite montré que cette proportionnalité entre l'activité stellaire et la rotation sature en deçà d'une certaine période (c'est-à-dire pour les rotateurs rapides, \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q) et que la période de saturation est plus élevée pour les étoiles moins massives \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
 {"rule":"D_A_J","sentence":"^\\QLa prochaine section offre un résumé des plus importantes.\\E$"}
+{"rule":"FR_SPELLING_RULE","sentence":"^\\QBourses et prix:\nBourse de doctorat en recherche (B2X, pour 4 ans à partir de l'été 2022, 21000 $ / an)\nBourse Lumbroso iREx (2000$).\\E$"}
