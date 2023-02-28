@@ -89,6 +89,7 @@ alias t='task'
 
 # Mutt
 alias mutt='neomutt'
+alias muttr='neomutt -R'
 
 # Mathematica wayland
 # alias mathematica='QT_QPA_PLATFORM=xcb mathematica'
