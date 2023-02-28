@@ -218,3 +218,5 @@ alias mambaload="eval \"\$(/home/vandal/programs/mambaforge/bin/conda shell.zsh 
 
 # Enable intel oneapi compilers (not python)
 alias isource="source /opt/intel/oneapi/setvars.sh --config=\"/home/vandal/.zsh/intel_oneapi_config.txt\""
+
+alias apero_source_setup="source /home/vandal/apero/default/apero/apero.zsh.setup"
