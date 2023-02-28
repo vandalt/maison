@@ -105,9 +105,11 @@ alias vim='nvim'
 alias vimtex='NVIM_LISTEN_ADDRESS=/tmp/texsocket nvim'
 alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland'
 
-export NNN_PLUG='z:autojump;f:fzopen;x:xdgdefault'
-
 alias znv='z notes; nvim'
+# -a is to have multiple FIFO parallel for preview, -A is to disable type-to-nav
+alias nnn='nnn -aA'
+export NNN_PLUG='z:autojump;f:fzopen;x:xdgdefault;p:preview-tui'
+export NNN_FIFO=/tmp/nnn.fifo
 
 # Notifications in sway
 # NOTE: No "toggle" for mako modes yet (https://github.com/emersion/mako/pull/382)
