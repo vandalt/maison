@@ -112,8 +112,8 @@ export NNN_FIFO=/tmp/nnn.fifo
 
 # Notifications in sway
 # NOTE: No "toggle" for mako modes yet (https://github.com/emersion/mako/pull/382)
-alias dnd='makoctl set-mode do-not-disturb'
-alias dndoff='makoctl set-mode default'
+alias dnd='makoctl mode -s dnd'
+alias dndoff='makoctl mode -s default'
 
 # Quick access to config files
 alias cnvim='z ~/.config/nvim; nvim init.lua; z -'
