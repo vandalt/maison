@@ -176,15 +176,16 @@ setopt CORRECT_ALL
 
 # mkdir and cd at once
 function mkcd() {
-    mkdir -p "$1" && cd "$1";
+  mkdir -p "$1" && cd "$1";
 }
 # Same but with z/zoxide/whatever autojump util
 function mkz() {
-    mkdir -p "$1" && z "$1";
+  mkdir -p "$1" && z "$1";
 }
 # View csv with less and column tools
 function csview {
-    column -s, -t "$@" | less -N -S
+  column -s, -t "$@" | less -N -S
+}
 # Go to notes and open nvim
 function znv() {
   if [[ $(basename "$(pwd)") != "notes" ]]; then
@@ -192,7 +193,6 @@ function znv() {
   fi
   nvim
 }
-
 
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
