@@ -20,3 +20,4 @@ qutebrowser/.config/qutebrowser/qsettings/
 qutebrowser/.config/qutebrowser/quickmarks
 
 systemd/.config/systemd/user/timers.target.wants/
+systemd/.config/systemd/user/default.target.wants/
