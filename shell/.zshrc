@@ -155,6 +155,9 @@ if [ $TERM = "xterm-kitty" ]; then
 
   alias icat="kitty +kitten icat"
   alias ssh="kitty +kitten ssh"
+  alias kd="kitty +kitten diff"
+  alias hrg="kitty + kitten hyperlinked_grep"
+  alias ktheme="kitty +kitten themes"
 fi
 
 
