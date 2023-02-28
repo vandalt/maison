@@ -35,6 +35,6 @@ fi
 export PATH
 
 # For juypter lab
-export WEBBPSF_PATH=$HOME/Documents/jwst/data/webbpsf-data
+export WEBBPSF_PATH=$HOME/Documents/data/package-data/webbpsf-data
 
 [ "$(tty)" = "/dev/tty1" ] && exec sway
