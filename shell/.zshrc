@@ -105,7 +105,6 @@ alias vim='nvim'
 alias vimtex='NVIM_LISTEN_ADDRESS=/tmp/texsocket nvim'
 alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland'
 
-alias znv='z notes; nvim'
 # -a is to have multiple FIFO parallel for preview, -A is to disable type-to-nav
 alias nnn='nnn -aA'
 export NNN_PLUG='z:autojump;f:fzopen;x:xdgdefault;p:preview-tui'
@@ -183,6 +182,12 @@ function mkz() {
 # View csv with less and column tools
 function csview {
     column -s, -t "$@" | less -N -S
+# Go to notes and open nvim
+function znv() {
+  if [[ $(basename "$(pwd)") != "notes" ]]; then
+    z notes
+  fi
+  nvim
 }
 
 
