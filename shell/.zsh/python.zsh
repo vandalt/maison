@@ -22,7 +22,13 @@ pact() {
 
 pydefaults() {
   # Some default packages. In a function to access outside nvenv
-  python -m pip install -U ipython ipdb ipykernel pyqt5 flake8 flake8-bugbear isort black
+  ipystr="ipython"
+  if [[ "$#" -ge 1 ]]; then
+    if [[ "$1" -le 3.8 ]]; then
+      ipystr="ipython<=8.12"
+    fi
+  fi
+  python -m pip install -U "$ipystr" ipdb ipykernel pyqt5 flake8 flake8-bugbear isort black jupytext
 }
 
 addipy() {
@@ -135,7 +141,11 @@ EOF
   # Update pip first
   $pycmd -m pip install -U pip wheel
 
-  pydefaults
+  if [[ -z "$pyVer" ]]; then
+    pydefaults
+  else
+    pydefaults "$pyVer"
+  fi
 
   # Make env available with jupyterlab
   echo ""

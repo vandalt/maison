@@ -1,4 +1,5 @@
 default-timeout=4000
+font=Fira Code 10
 
 [mode=dnd]
 invisible=1

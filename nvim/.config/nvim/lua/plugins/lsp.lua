@@ -1,10 +1,37 @@
+Util = require("utils")
+
+
 return {
   {
     "neovim/nvim-lspconfig",
+    dependencies = {
+      {
+        "barreiroleo/ltex_extra.nvim",
+        dev = false,
+      },
+    },
+    -- event = { "BufReadPre", "BufNewFile", "BufEnter" },
+    init = function()
+      local keys = require("lazyvim.plugins.lsp.keymaps").get()
+      keys[#keys + 1] = { "<leader>ct", ":LspStop ", desc = "Stop an LSP client", silent = false }
+    end,
     opts = {
       autoformat = false,
       servers = {
-        yamlls = {},
+        yamlls = {
+          settings = {
+            yaml = {
+              keyOrdering = false
+            }
+          }
+        },
+        ltex = {
+          settings = {
+            ltex = {
+              enabled = Util.get_enable_ltex(),
+            }
+          }
+        },
         pyright = {
           settings = {
             python = {
@@ -12,9 +39,15 @@ return {
                 typeCheckingMode = "off",
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
+                disagnosticMode = 'openFilesOnly'
               },
             },
           },
+        },
+        clangd = {
+          capabilities = {
+            offsetEncoding = "utf-8"
+          }
         },
         texlab = {
           settings = {
@@ -56,18 +89,56 @@ return {
           }
         }
       },
+      setup = {
+        texlab = function(_, opts)
+          require("lazyvim.util").on_attach(function(client)
+            if client.name == "texlab" then
+              vim.keymap.set("n", "<leader>tb", "<Cmd>TexlabBuild<CR>", { desc = "Build Tex file" })
+              vim.keymap.set("n", "<leader>tf", "<Cmd>TexlabForward<CR>", { desc = "Go to location in PDF" })
+            end
+          end)
+        end,
+        ltex = function(_, opts)
+          require("lazyvim.util").on_attach(function(client)
+            if client.name == "ltex" then
+              require("ltex_extra").setup{
+                load_langs = { "fr", "en-US" },
+                init_check = true, -- boolean : whether to load dictionaries on startup
+                path = vim.fn.expand("~") .. "/.local/share/ltex/",
+                log_level = "warn", -- string : "none", "trace", "debug", "info", "warn", "error", "fatal"
+              }
+            end
+          end)
+        end
+      }
     },
   },
 
   {
     "jose-elias-alvarez/null-ls.nvim",
-    opts = function()
+    -- event = { "BufReadPre", "BufNewFile", "BufEnter" },
+    opts = function(_, opts)
       local nls = require("null-ls")
-      return {
-        sources = {
-          nls.builtins.formatting.black,
-          nls.builtins.formatting.isort,
-        },
+      -- nls.builtins.formatting.stylua,
+      -- nls.builtins.formatting.shfmt,
+      -- nls.builtins.diagnostics.flake8,
+      --
+      opts.sources = {
+        nls.builtins.formatting.black,
+        nls.builtins.formatting.isort,
+        nls.builtins.formatting.stylua,
+        nls.builtins.formatting.shfmt,
+        nls.builtins.diagnostics.flake8.with({
+          args = {
+            "--ignore",
+            "E501,W503,E203,E402,E722,E111,E114,E226",
+            "--format",
+            "default",
+            "--stdin-display-name",
+            "$FILENAME",
+            "-",
+          },
+        }),
       }
     end,
   },

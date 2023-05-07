@@ -36,5 +36,7 @@ export PATH
 
 # For juypter lab
 export WEBBPSF_PATH=$HOME/Documents/data/package-data/webbpsf-data
+export JUPYTERLAB_DIR=$HOME/.local/share/jupyter/lab
+export XLA_FLAGS="--xla_force_host_platform_device_count=8 --xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1"
 
 [ "$(tty)" = "/dev/tty1" ] && exec sway

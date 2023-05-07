@@ -25,18 +25,18 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
 
-source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source ~/programs/powerlevel10k/powerlevel10k.zsh-theme
+# source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 function precmd () {
   echo -ne "\033]0;$(pwd | sed -e "s;^$HOME;~;")\a"
 }
 
-# source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-# source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source /usr/share/doc/pkgfile/command-not-found.zsh
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/doc/pkgfile/command-not-found.zsh
 
 setopt autocd
 
@@ -50,9 +50,9 @@ source ~/.zsh/python.zsh
 source ~/.zsh/onedrive.zsh
 
 # Must be after vi/emacs mode
-source /usr/share/fzf/shell/key-bindings.zsh
-#source /usr/share/fzf/key-bindings.zsh
-#source /usr/share/fzf/completion.zsh
+# source /usr/share/fzf/shell/key-bindings.zsh
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
 
 if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -71,6 +71,7 @@ alias ll='ls -l'
 alias lla='ls -la'
 alias la='ls -a'
 alias lsd='ls -d'
+alias lt='ls -lt'
 alias ltr='ls -ltr'
 alias treei='tree --gitignore'
 alias rmr='rm -rI'
@@ -104,6 +105,17 @@ alias vim='nvim'
 # To enable reverse search with synctex by double-clicking PDF
 alias vimtex='NVIM_LISTEN_ADDRESS=/tmp/texsocket nvim'
 alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland'
+
+if [ -n "$NVIM_LISTEN_ADDRESS" ]; then 
+  alias nvim="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+fi
+if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+    export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+    export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+else
+    export VISUAL="nvim"
+    export EDITOR="nvim"
+fi
 
 # -a is to have multiple FIFO parallel for preview, -A is to disable type-to-nav
 alias nnn='nnn -aA'
@@ -144,6 +156,7 @@ export CRDS_SERVER_URL=https://jwst-crds.stsci.edu
 export MIRAGE_DATA=$HOME/Documents/data/package-data/mirage-data/mirage_data
 # Dsiable jupyter "frozen packges" warning for python 3.11
 export PYDEVD_DISABLE_FILE_VALIDATION=1
+export JUPYTERLAB_DIR=$HOME/.local/share/jupyter/lab
 
 # Kitty
 if [ $TERM = "xterm-kitty" ]; then
@@ -187,9 +200,10 @@ function csview {
   column -s, -t "$@" | less -N -S
 }
 # Go to notes and open nvim
+export ZK_NOTEBOOK_DIR="/home/vandal/notes"
 function znv() {
   if [[ $(basename "$(pwd)") != "notes" ]]; then
-    z notes
+    z $ZK_NOTEBOOK_DIR
   fi
   nvim
 }
@@ -198,7 +212,7 @@ function znv() {
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-JWST_TOKEN_FILE=~/repos/jwst-manage-data/latest_token.txt
+JWST_TOKEN_FILE=~/repos/astro/jwst-manage-data/latest_token.txt
 if [[ -f "$JWST_TOKEN_FILE" ]]; then
   export MAST_API_TOKEN="$(cat $JWST_TOKEN_FILE)"
 fi
@@ -214,7 +228,9 @@ fi
 
 alias luamake=/home/vandal/programs/lua-language-server/3rd/luamake/luamake
 
-alias mambaload="eval \"\$(/home/vandal/programs/mambaforge/bin/conda shell.zsh hook)\""
+# Conda init stuff slows down shell. Load only when used (not my main Python)
+# Tiny delay from conda init would be OK if used mamba as main Python.
+alias mambaload="eval \"\$(/home/vandal/mambaforge/bin/conda shell.zsh hook)\""
 
 # Enable intel oneapi compilers (not python)
 alias isource="source /opt/intel/oneapi/setvars.sh --config=\"/home/vandal/.zsh/intel_oneapi_config.txt\""

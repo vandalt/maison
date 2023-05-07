@@ -10,6 +10,7 @@ bind O fillcmdline tabopen
 bind t current_url open
 bind W hint -w
 blacklistadd localhost:\d+/lab
+blacklistadd localhost:\d+/tree
 blacklistadd overleaf.com/project/
 blacklistadd docs.google.com
 blacklistadd colab.research.google.com
@@ -17,4 +18,5 @@ blacklistadd am.ticketmaster.com
 
 setnull searchurls.github
 set searchurls.gh https://github.com/search?utf8=✓&q=
-set newtab https://web.tabliss.io/
+set newtab https://web.tabliss.io
+set searchengine google
