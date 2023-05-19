@@ -3,16 +3,13 @@
 ## make default editor Neovim
 export EDITOR=nvim
 
-# Added by Toolbox App
-export PATH="$PATH:/home/vandal/.local/share/JetBrains/Toolbox/scripts"
-
 #
 #eval $(gnome-keyring-daemon --start)
 #export SSH_AUTH_SOCK
 #
 # Most pure GTK3 apps use wayland by default, but some,
 # like Firefox, need the backend to be explicitely selected.
-# export MOZ_ENABLE_WAYLAND=1
+export MOZ_ENABLE_WAYLAND=1
 # export MOZ_DBUS_REMOTE=1
 # export GTK_CSD=0
 
@@ -25,8 +22,8 @@ export QT_QPA_PLATFORM="wayland"
 export _JAVA_AWT_WM_NONREPARENTING=1
 
 # set default shell and terminal
-export SHELL=/usr/bin/zsh
-#export SHELL=/usr/bin/bash
+# export SHELL=/usr/bin/zsh
+# export SHELL=/usr/bin/bash
 # export TERMINAL_COMMAND=/usr/bin/alacritty
 
 # User specific environment
@@ -36,4 +33,3 @@ then
     PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 fi
 export PATH
-

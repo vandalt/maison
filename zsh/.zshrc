@@ -84,43 +84,13 @@ alias open='xdg-open'
 alias ...="cd ../.."
 alias gof="open ."
 alias scls="screen -ls"
-alias slack="/usr/bin/slack --ozone-platform=wayland"
-
-alias t='task'
 
 # Mutt
 alias mutt='neomutt'
 alias muttr='neomutt -R'
 
-# Mathematica wayland
-# alias mathematica='QT_QPA_PLATFORM=xcb mathematica'
-
-# Clone and update AUR in aur dir
-alias auracle='auracle -C ~/aur'
-
 # Editor
 export EDITOR='nvim'
-alias v='nvim'
-alias vim='nvim'
-# To enable reverse search with synctex by double-clicking PDF
-alias vimtex='NVIM_LISTEN_ADDRESS=/tmp/texsocket nvim'
-alias code='code --enable-features=UseOzonePlatform --ozone-platform=wayland'
-
-if [ -n "$NVIM_LISTEN_ADDRESS" ]; then 
-  alias nvim="nvr -cc split --remote-wait +'set bufhidden=wipe'"
-fi
-if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
-    export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
-    export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
-else
-    export VISUAL="nvim"
-    export EDITOR="nvim"
-fi
-
-# -a is to have multiple FIFO parallel for preview, -A is to disable type-to-nav
-alias nnn='nnn -aA'
-export NNN_PLUG='z:autojump;f:fzopen;x:xdgdefault;p:preview-tui'
-export NNN_FIFO=/tmp/nnn.fifo
 
 # Notifications in sway
 # NOTE: No "toggle" for mako modes yet (https://github.com/emersion/mako/pull/382)
@@ -130,9 +100,6 @@ alias dndoff='makoctl mode -s default'
 # Quick access to config files
 alias cnvim='z ~/.config/nvim; nvim init.lua; z -'
 alias cs='nvim ~/.config/sway/config'
-alias cterm='nvim ~/.config/kitty/kitty.conf'
-alias ctask='nvim ~/.config/task/taskrc'
-alias zshrc='nvim ~/.zshrc'
 
 # alias jwst-apt='~/programs/APT/APT'
 
@@ -229,7 +196,7 @@ fi
 alias luamake=/home/vandal/programs/lua-language-server/3rd/luamake/luamake
 
 # Conda init stuff slows down shell. Load only when used (not my main Python)
-# Tiny delay from conda init would be OK if used mamba as main Python.
+# Tiny delay from conda init would be OK if used conda/mamba as main Python.
 alias mambaload="eval \"\$(/home/vandal/mambaforge/bin/conda shell.zsh hook)\""
 
 # Enable intel oneapi compilers (not python)

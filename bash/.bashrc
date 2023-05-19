@@ -23,7 +23,6 @@ export PATH
 # export SYSTEMD_PAGER=
 
 # User specific aliases and functions
-alias vim='nvim'
 if [ -d ~/.bashrc.d ]; then
     for rc in ~/.bashrc.d/*; do
         if [ -f "$rc" ]; then
@@ -33,5 +32,3 @@ if [ -d ~/.bashrc.d ]; then
 fi
 
 unset rc
-
-alias luamake=/home/vandal/programs/lua-language-server/3rd/luamake/luamake
