@@ -1,9 +1,0 @@
-{"rule":"COMMA_PARENTHESIS_WHITESPACE","sentence":"^\\QIf we don't use .detach(), the gradients of fake will be\\E$"}
-{"rule":"COMMA_PARENTHESIS_WHITESPACE","sentence":"^\\QIf we don't use .detach(), the gradients of fake will be added to the computation graph for disc_loss.\\E$"}
-{"rule":"COMMA_PARENTHESIS_WHITESPACE","sentence":"^\\QThis means that when we propagate the gradients with .backward(), the gradient of fake will be cleared and therefore not usable in the generator loss (trying to remove detach and run indeed gives an error along those lines).\\E$"}
-{"rule":"REPEATED_VERBS","sentence":"^\\QGoals\nWrap official JWST pipeline pipelines and steps\\E$"}
-{"rule":"REPEATED_VERBS","sentence":"^\\QGoals\nWrap official JWST pipeline pipelines and steps\nCreate custom steps and pipelines for JWST\\E$"}
-{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q\\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q is proposal ID\n\\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q is \"lookback time\".\\E$"}
-{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\Q- Observe a visual binary (psi Vel) to test offsetting the guiding from the fiber.\\E$"}
-{"rule":"WHITESPACE_RULE","sentence":"^\\QThe first test for this did not quite work.\\E$"}
-{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QWe had doubt on the WCS\n  coordinates, so Gaspare proposed a test to re-verify pixel scale and\n  rotation.\\E$"}

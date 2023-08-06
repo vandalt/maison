@@ -1,26 +1,23 @@
 return {
-  -- add gruvbox
-  {
-    "ellisonleao/gruvbox.nvim",
-    lazy = true,
-  },
-
-  {
-    "folke/tokyonight.nvim",
-    lazy = true,
-    opts = { style = "moon" },
-  },
-
   {
     "catppuccin/nvim",
-    lazy = true,
-    name = "catppuccin",
+    name="catppuccin",
+    opts = {
+      integrations = {
+        illuminate = true,
+      }
+    }
   },
-
+  {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = { style = "moon" },
+  },
   {
     "LazyVim/LazyVim",
     opts = {
       colorscheme = "tokyonight",
-    },
+    }
   },
 }

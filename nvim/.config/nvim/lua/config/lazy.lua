@@ -12,6 +12,9 @@ require("lazy").setup({
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- import any extras modules here
     { import = "lazyvim.plugins.extras.coding.copilot" },
+    { import = "lazyvim.plugins.extras.dap.core" },
+    { import = "lazyvim.plugins.extras.lang.python" },
+    { import = "lazyvim.plugins.extras.lang.tex" },
     -- { import = "lazyvim.plugins.extras.lang.typescript" },
     -- { import = "lazyvim.plugins.extras.lang.json" },
     -- { import = "lazyvim.plugins.extras.ui.mini-animate" },
@@ -27,11 +30,15 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
+  ---@diagnostic disable-next-line: assign-type-mismatch
   dev = {
     path = "~/repos/perso",
   },
-  install = { colorscheme = { "tokyonight", "habamax" } },
-  checker = { enabled = true }, -- automatically check for plugin updates
+  install = { colorscheme = { "catppuccin", "tokyonight", "habamax" } },
+  checker = {
+    enabled = true, -- automatically check for plugin updates
+    frequency = 3600 * 24, -- Check for updates every day
+  },
   performance = {
     rtp = {
       -- disable some rtp plugins

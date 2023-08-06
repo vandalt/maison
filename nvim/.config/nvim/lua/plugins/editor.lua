@@ -1,43 +1,81 @@
+local function run_py_file()
+	-- TODO: probably a way to do this with toggleterm+lua
+	-- TODO: Separate function to handle the "shellescape" part
+	local myfn = vim.fn.expand("%"):gsub(" ", "\\\\ "):gsub("#", "\\\\#")
+	vim.cmd([[:TermExec cmd="python ]] .. myfn .. [["<CR>]])
+end
+
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     opts = {
       close_if_last_window = true,
-    }
+    },
   },
-
   {
-    "nvim-telescope/telescope.nvim",
-    keys = {
-      { "<leader>sc", false }
-    }
-  },
-
-  {
-    "TimUntersberger/neogit",
-    dependencies = { "sindrets/diffview.nvim", "nvim-lua/plenary.nvim" },
+    "folke/which-key.nvim",
     opts = {
-      integrations = {
-              diffview = true,
+      defaults = {
+        ["<leader>z"] = { name = "+zk" },
+        -- ["<leader>m"] = { name = "+markdown" },
+        ["<leader>n"] = { name = "+neogen" },
+        ["<leader>i"] = { name = "+ipython (REPLs)" },
       },
     },
-    keys = {
-      { "<leader>gn", "<cmd>Neogit<CR>", desc = "Open neogit" },
-    }
   },
-
-  { "tpope/vim-eunuch" },
   {
-    "akinsho/nvim-toggleterm.lua",
+    "KenN7/vim-arsync",
+    dependencies = {
+      "prabirshrestha/async.vim",
+    },
+    keys = {
+      { "<leader>ru", "<cmd>ARsyncUp<CR>", desc = "Push with rsync" },
+      { "<leader>rk", "<cmd>ARsyncUpDelete<CR>", desc = "Push with rsync and delete files" },
+      { "<leader>rd", "<cmd>ARsyncDown<CR>", desc = "Pull with rsync" },
+    },
+  },
+  "tpope/vim-eunuch",
+  {
+    "pwntester/octo.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    cond = vim.fn.executable("gh"),
+    config = true,
+    -- config = function()
+    --   require("octo").setup()
+    -- end
+  },
+  {
+    'akinsho/toggleterm.nvim',
+    version = "*",
     opts = {
-      open_mapping = [[<A-\>]],
+      open_mapping = [[<C-\>]],
       start_in_insert = false,
-    }
+    },
+    keys = {
+      {"<leader>pr", function() run_py_file() end, desc = "Run Python file in terminal" },
+    },
+    lazy = false,
   },
   {
-    "szw/vim-maximizer",
+    "NeogitOrg/neogit",
+    dependencies = "nvim-lua/plenary.nvim",
+    opts = {
+      disable_commit_confirmation = true,
+    },
     keys = {
-      { "<leader>mm", "<cmd>MaximizerToggle!<CR>", desc = "Maximize current window" },
-    }
-  }
+      { "<leader>gn", "<Cmd>Neogit<CR>", desc = "Open neogit window" },
+    },
+  },
+  {
+    "RRethy/vim-illuminate",
+    -- enabled = false,
+    -- keys = {
+    --   { "]r", desc = "Next Reference" },
+    --   { "[r", desc = "Prev Reference" },
+    -- },
+  },
 }

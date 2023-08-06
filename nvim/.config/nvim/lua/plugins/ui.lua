@@ -15,14 +15,12 @@ return {
       },
     },
   },
-
   {
     "goolord/alpha-nvim",
     opts = function(_, dashboard)
-      -- local dashboard = require("alpha.themes.dashboard")
       local custom_buttons = {
         dashboard.button("v", "󱓟" .. " LazyVim directory", ":e $HOME/.local/share/nvim/lazy/LazyVim/README.md <CR>"),
-        dashboard.button("z", "" .. " Go to notes", ":cd $HOME/notes <CR> :ene <CR>"),
+        dashboard.button("z", "" .. " Go to notes", ":cd $HOME/notes <CR> :e index.md <CR>"),
         -- dashboard.button("q", " " .. " Quit", ":qa<CR>"),
       }
       for _, button in ipairs(custom_buttons) do
@@ -30,8 +28,9 @@ return {
         button.opts.hl_shortcut = "AlphaShortcut"
         table.insert(dashboard.section.buttons.val, 5, button)
       end
-      -- dashboard.section.buttons.val = vim.list_extend(dashboard.section.buttons.val, custom_buttons, 4)
-      return dashboard
     end,
+    keys = {
+      { "<leader>hh", "<cmd>Alpha<CR>", desc = "[H]ead to [h]ome screen" },
+    },
   },
 }

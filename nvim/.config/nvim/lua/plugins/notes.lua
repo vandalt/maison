@@ -1,8 +1,42 @@
-Util = require("utils")
-
 local zk_start_week = "sunday"
 
+local function create_reading_tbl()
+	local author = vim.fn.input("Author: ")
+	local year = vim.fn.input("Year: ")
+	local readingid = vim.fn.input("Reading ID: ")
+
+	local title = table.concat({ author, year, readingid }, " ")
+
+	local zk_tbl = { title = title, dir = "readings", extra = { author = author, year = year, readingid = readingid } }
+	-- local reading_str = vim.inspect(zk_tbl, {newline = " ", indent=""})
+	-- return reading_str
+	return zk_tbl
+end
+
+local function get_date_zw(start_week_day)
+  start_week_day = start_week_day or "sunday"
+  ---@diagnostic disable-next-line: assign-type-mismatch
+	if string.lower(os.date("%A")) == start_week_day then
+		return "today"
+	else
+		return start_week_day
+	end
+end
+
 return {
+  {
+    -- NOTE: Using a fork until "checkhealth" issue is fixed
+    -- "ekickx/clipboard-image.nvim",
+    "postfen/clipboard-image.nvim",
+    opts = {
+      default = {
+        img_dir = { "%:p:h", "img" },
+      }
+    },
+    keys = {
+      { "<leader>mp", "<Cmd>PasteImg<CR>", desc = "Paste image" },
+    },
+  },
   {
     "mickael-menu/zk-nvim",
     name = "zk",
@@ -38,9 +72,9 @@ return {
       { "<leader>zn", function() require("zk").new({ title = vim.fn.input("Title: "), dir = vim.fn.input("Dir: ", "", "dir") }) end, desc = "New note (zk)" },
       { "<leader>zd", function() require("zk").new({ dir = 'daily' }) end, desc = "Daily log (zk)" },
       { "<leader>zz", function() require("zk").new({ title = vim.fn.input('Title: '), dir = 'zettel' }) end, desc = "New Zettel file (zk)" },
-      { "<leader>zr", function() require("zk").new(Util.create_reading_tbl()) end, desc = "New reading note (zk)" },
+      { "<leader>zr", function() require("zk").new(create_reading_tbl()) end, desc = "New reading note (zk)" },
       -- The function ensures that if today is the desired week day, use today and not one week ago
-      { "<leader>zww", function() require("zk").new({ dir = 'weekly', date = Util.get_date_zw(zk_start_week) }) end, desc = "Weekly log (zk)" },
+      { "<leader>zww", function() require("zk").new({ dir = 'weekly', date = get_date_zw(zk_start_week) }) end, desc = "Weekly log (zk)" },
       { "<leader>zwl", function() require("zk").new({ dir = 'weekly', date = zk_start_week .. " last week" }) end, desc = "Last weekly log (zk)" },
       { "<leader>zwn", function() require("zk").new({ dir = 'weekly', date = "next" .. zk_start_week }) end, desc = "Next weekly log (zk)" },
       { "<leader>zk", function() require("zk").new({ title = 'backlog' }) end, desc = "Go to backlog (zk)" },
@@ -55,7 +89,6 @@ return {
       { "<leader>zf", ":'<,'>ZkMatch<CR>", mode = { "x" }, desc = "Search notes matching selection (zk)"}
     }
   },
-
   {
     "jakewvincent/mkdnflow.nvim",
     name = "mkdnflow",
@@ -89,19 +122,6 @@ return {
       },
     }
   },
-
-  {
-    "ekickx/clipboard-image.nvim",
-    opts = {
-      default = {
-        img_dir = { "%:p:h", "img" },
-      }
-    },
-    keys = {
-      { "<leader>ip", "<Cmd>PasteImg<CR>", desc = "Paste image" },
-    },
-  },
-
   {
     "iamcco/markdown-preview.nvim",
     build = function() vim.fn["mkdp#util#install"]() end,
