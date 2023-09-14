@@ -17,7 +17,7 @@ set mail_check = 5  # Interval to check for mail
 set mail_check_stats  # Update mail status
 set mail_check_stats_interval = 5  # Update mail status at this interval
 set wait_key = no  # Silently return after external commands
-set sidebar_visible = yes
+set sidebar_visible = no
 set sidebar_short_path = yes
 set move = no  # Handled by imap stuff
 set delete  # Don't ask before deleting
@@ -64,6 +64,7 @@ set include  # Include copy of message in reply
 set attribution = "\nOn %d, %n wrote:\n"  # Pattern before message replied to
 set query_command = "echo %s | xargs khard email --parsable --"
 set query_format="%4c %t %-70.70a %-70.70n %?e?(%e)?"
+set forward_format = "Fwd: %s"
 
 ### Keybindings
 bind editor <Tab>  complete-query
