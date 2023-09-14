@@ -4,6 +4,8 @@
 
 vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+y$]])
+vim.keymap.set({"n", "v"}, "<leader>p", [["+p]])
+vim.keymap.set("n", "<leader>P", [["+P]])
 
 vim.keymap.set("i", "<A-.>", "<C-v>u00b7", { desc = "Point médian" })
 vim.keymap.set("i", "<A-d>", "📅", { desc = "Calendar icon" })
