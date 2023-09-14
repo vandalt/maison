@@ -1,50 +1,55 @@
 #!/usr/bin/env bash
 
-OUTPUT_DIR="$HOME/Pictures/apod"
-BKG_PATH="$HOME/Pictures/background.jpg"
-DESCRIPTION_PATH="$HOME/.local/share/apod/description.txt"
-KEY_PATH="$HOME/.config/apod/key"
+# From https://github.com/geeseven/sway-nasa-apod/blob/main/nasa-apod.sh
+# Sway Nasa Astronomy Picture of the Day background
+# requires curl, pcre and sway
 
-nasa_api_key=$(cat "$KEY_PATH")
-api_url="https://api.nasa.gov/planetary/apod?api_key=$nasa_api_key"
+# exit on error
+set -e
 
-apod_json=$(curl -s $api_url)
+random=$(echo "random" | \
+	fold -w1 | shuf | \
+	tr -d '\n' \
+)
+img_regex='<IMG SRC="(.*)"'
+script_path=$(dirname "$(readlink -f "$0")")
+local_image_path=~/Pictures/nasa-apod.jpg
 
-if [ -z "$apod_json" ]; then
-    echo "Could not get APOD. Exiting"
-    exit 1
-fi
-
-media_type=$(echo $apod_json | jq -r .media_type)
-description=$(echo $apod_json | jq -r .explanation)
-
-if [ $media_type != "image" ]; then
-    exit 2
-fi
-
-set_background () {
-    ln -sf "$2" "$BKG_PATH"
-    swaymsg "output * bg $BKG_PATH fill"
-}
-download_image () {
-    wget --quiet -O "$2" "$1"
+get_img() {
+	remote_image_path=$(curl "$1" 2>/dev/null | \
+		pcregrep --only-matching=1 "$img_regex" \
+	)
+	image_url="https://apod.nasa.gov/apod/$remote_image_path"
+	curl --silent --output "$local_image_path" "$image_url"
 }
 
-img_url=$(echo $apod_json | jq -r .hdurl)
-img_date=$(echo $apod_json | jq -r .date)
-img_title=$(echo $apod_json | jq -r .title)
-output_path="$OUTPUT_DIR"/"$img_date"-"$img_title.jpg"
 
-if [ ! -f "$output_path" ]; then
-    download_image "$img_url" "$output_path"
+if [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
+	echo "Usage: ${0##*/} [-h] [-r]"
+	echo ""
+        echo "set Sway background to Nasa Astronomy Picture of the Day"
+	echo ""
+	echo "optional arguments:"
+	echo "  -h, --help            show this help message and exit"
+	echo "  -r, --$random          pick random day from the archive, url saved to $script_path/last_random_url"
+	exit 0
+elif [[ "$1" = "-r" ]] || [[ "$1" = "$random" ]] ; then
+	archive_list_url="https://apod.nasa.gov/apod/archivepixFull.html"
+	archive_regex='<a href="(ap.*.html)'
+	archive_urls=$(curl --silent "$archive_list_url" | \
+		pcregrep --only-matching=1 "$archive_regex" \
+	)
+	url=$(echo "$archive_urls" | \
+		sort --random-sort | \
+		head --lines=1 \
+	)
+	url=https://apod.nasa.gov/apod/"$url"
+  notify-send "Getting NASA APOD from $url"
+	get_img "$url"
+  notify-send "Got NASA APOD from $url"
+
+	echo "$url" > "$script_path/last_random_url"
 else
-    file_size=$(stat -c %s "$output_path")
-    remote_size=$(wget --spider "$img_url" 2>&1 | grep Length | awk '{print $2}')
-    if [ "$remote_size" -ne "$file_size" ]; then
-        download_image "$img_url" "$output_path"
-    fi
+	url="https://apod.nasa.gov/apod/astropix.html"
+	get_img "$url"
 fi
-
-set_background "$img_url" "$output_path"
-
-echo "$description" > "$DESCRIPTION_PATH"
