@@ -16,6 +16,8 @@ blacklistadd overleaf.com/project/
 blacklistadd docs.google.com
 blacklistadd colab.research.google.com
 blacklistadd am.ticketmaster.com
+blacklistadd typing.io
+blacklistadd keybr.com
 
 setnull searchurls.github
 set searchurls.gh https://github.com/search?utf8=✓&q=
