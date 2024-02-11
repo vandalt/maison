@@ -118,6 +118,10 @@ macro compose K "| pandoc --lua-filter=/home/vandal/.config/neomutt/horizontalru
 macro index,pager C \
   "<pipe-message>khard add-email<return>" \
   "add the sender email address to khard"
+macro pager,attach 'V' "<pipe-entry>iconv -c --to-code=UTF8 > /tmp/mail.html<enter><shell-escape>firefox /tmp/mail.html<enter>"
+
+
+auto_view text/html
 
 # Jump to mailboxes/folders
 macro index \e1 "<change-folder> =udem/Inbox/<enter>"
