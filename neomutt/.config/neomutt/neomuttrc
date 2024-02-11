@@ -40,8 +40,8 @@ set sidebar_delim_chars="/"  # Delimiter for splits in mailboxes
 set sidebar_indent_string="  "  # Indent for folders
 
 # Notifications
-set new_mail_command="notify-send --hint int:transient:1 --icon='/home/vandal/Pictures/icons/neomutt.png' \
-'New Email.' 'You have new mail.' &"
+# set new_mail_command="notify-send --hint int:transient:1 --icon='/home/vandal/Pictures/icons/neomutt.png' \
+# 'New Email.' 'You have new mail.' &"
 
 ### Reading messages
 # Define how to open messages
