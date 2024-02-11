@@ -9,6 +9,9 @@ set record = "$my_folder/Sent"
 
 # Send mail
 set from = "thomasvandal@hotmail.com"
+set sig_dashes = yes
+set sig_on_top = no
+unset signature
 set sendmail = "/usr/bin/msmtp -a personal"
 
 # These change depending on acount folder names so put them here for each account

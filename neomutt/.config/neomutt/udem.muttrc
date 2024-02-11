@@ -9,6 +9,9 @@ set record = "$my_folder/Sent Items"
 
 # Send mail
 set from = "thomas.vandal@umontreal.ca"
+set sig_dashes = no
+set sig_on_top = yes
+set signature = "~/.config/neomutt/signature.sig"
 set sendmail = "/usr/bin/msmtp -a udem"
 
 # These change depending on acount folder names so put them here for each account
