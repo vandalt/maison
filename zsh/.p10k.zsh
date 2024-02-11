@@ -99,8 +99,8 @@
     # ram                   # free RAM
     # swap                  # used swap
     todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
-    timewarrior             # timewarrior tracking status (https://timewarrior.net/)
-    taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
+    # timewarrior             # timewarrior tracking status (https://timewarrior.net/)
+    # taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
     # time                  # current time
     # =========================[ Line #2 ]=========================
     newline                 # \n
@@ -186,7 +186,7 @@
   # OS identifier color.
   typeset -g POWERLEVEL9K_OS_ICON_FOREGROUND=
   # Custom icon.
-  # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
+  # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION=' '
 
   ################################[ prompt_char: prompt symbol ]################################
   # Green prompt symbol if the last command succeeded.
