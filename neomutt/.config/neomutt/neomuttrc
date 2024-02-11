@@ -104,13 +104,13 @@ macro index M "<save-message>?<toggle-mailboxes>"
 macro pager \cb <pipe-entry>'urlview'<enter> 'Follow links with urlview'
 
 # Multi/alternatives for text and html in composed messages
-macro compose Y "| pandoc -f markdown -t html -o /tmp/neomutt-alternative.html<enter>\
+macro compose Y "| pandoc --lua-filter=/home/vandal/.config/neomutt/horizontalrule.lua --markdown-headings=atx -f markdown -t html -o /tmp/neomutt-alternative.html<enter>\
 <attach-file>/tmp/neomutt-alternative.html<enter>\
 <toggle-unlink><toggle-disposition>\
 <tag-entry><first-entry><tag-entry><group-alternatives>\
 <send-message>"
 
-macro compose K "| pandoc -f markdown -t html -o /tmp/neomutt-alternative.html<enter>\
+macro compose K "| pandoc --lua-filter=/home/vandal/.config/neomutt/horizontalrule.lua --markdown-headings=atx -f markdown -t html -o /tmp/neomutt-alternative.html<enter>\
 <attach-file>/tmp/neomutt-alternative.html<enter>\
 <toggle-unlink><toggle-disposition>\
 <tag-entry><first-entry><tag-entry><group-alternatives>"
