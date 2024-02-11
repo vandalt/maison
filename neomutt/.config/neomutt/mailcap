@@ -6,8 +6,8 @@ image/png; imv %s
 # image/jpeg; eog %s
 # image/png; eog %s
 # application/pdf; okular %s
-application/pdf; zathura %s
-# application/pdf; xdg-open %s
+# application/pdf; zathura %s
+application/pdf; xdg-open %s
 application/msword; libreoffice --writer %s
 application/vnd.openxmlformats-officedocument.wordprocessingml.document; libreoffice --writer %s
 application/vnd.openxmlformats-officedocument.wordprocessingml.document; libreoffice --writer %s
