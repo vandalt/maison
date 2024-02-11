@@ -170,7 +170,7 @@ config.set('auto_save.session', True)
 c.url.default_page = 'https://web.tabliss.io/'
 c.url.start_pages = 'https://web.tabliss.io/'
 c.url.searchengines = {
-    'DEFAULT': 'https://google.com/search?q={}',
-    'ddg': 'https://duckduckgo.com/?q={}',
+    'DEFAULT': 'https://duckduckgo.com/?q={}',
+    'ggl': 'https://google.com/search?q={}',
     'gh': 'https://github.com/search?q={}',
 }
