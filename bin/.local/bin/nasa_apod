@@ -14,15 +14,30 @@ random=$(echo "random" | \
 img_regex='<IMG SRC="(.*)"'
 script_path=$(dirname "$(readlink -f "$0")")
 local_image_path=~/Pictures/nasa-apod.jpg
+random_image_path=~/Pictures/nasa-apod-random.jpg
 
 get_img() {
 	remote_image_path=$(curl "$1" 2>/dev/null | \
 		pcregrep --only-matching=1 "$img_regex" \
 	)
+
 	image_url="https://apod.nasa.gov/apod/$remote_image_path"
-	curl --silent --output "$local_image_path" "$image_url"
+
+	if [ ! -z "$3" ]; then
+		image_path="$3"
+	elif [[ "$2" = "random" ]]; then
+		image_path="$random_image_path"
+	else
+		image_path="$local_image_path"
+	fi
+	curl --silent --output "$image_path" "$image_url"
 }
 
+if [[ "$2" = "-o" ]] || [[ "$2" = "--out" ]]; then
+	custom_img_path="$3"
+	echo "Using custom path $custom_img_path"
+	notify-send "Using custom path $custom_img_path"
+fi
 
 if [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
 	echo "Usage: ${0##*/} [-h] [-r]"
@@ -31,7 +46,8 @@ if [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
 	echo ""
 	echo "optional arguments:"
 	echo "  -h, --help            show this help message and exit"
-	echo "  -r, --$random          pick random day from the archive, url saved to $script_path/last_random_url"
+	echo "  -r, --random          pick random day from the archive, url saved to $script_path/last_random_url"
+	echo "  -o, --out             specify output file path"
 	exit 0
 elif [[ "$1" = "-r" ]] || [[ "$1" = "$random" ]] ; then
 	archive_list_url="https://apod.nasa.gov/apod/archivepixFull.html"
@@ -45,11 +61,13 @@ elif [[ "$1" = "-r" ]] || [[ "$1" = "$random" ]] ; then
 	)
 	url=https://apod.nasa.gov/apod/"$url"
   notify-send "Getting NASA APOD from $url"
-	get_img "$url"
+	get_img "$url" "random" "$custom_img_path"
   notify-send "Got NASA APOD from $url"
 
 	echo "$url" > "$script_path/last_random_url"
 else
+  notify-send "Getting NASA APOD from $url"
 	url="https://apod.nasa.gov/apod/astropix.html"
-	get_img "$url"
+	get_img "$url" "daily" "$custom_img_path"
+  notify-send "Got NASA APOD from $url"
 fi
