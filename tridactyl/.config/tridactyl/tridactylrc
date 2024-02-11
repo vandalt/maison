@@ -21,5 +21,5 @@ blacklistadd keybr.com
 
 setnull searchurls.github
 set searchurls.gh https://github.com/search?utf8=✓&q=
-set newtab https://web.tabliss.io
-set searchengine google
+set homepages ['https://web.tabliss.io']
+set searchengine duckduckgo
