@@ -3,5 +3,7 @@ show-failed-attempts
 # ignore-empty-password
 indicator
 clock
+# color=000000
 timestr=%H:%M
+image=/home/vandal/Pictures/orion_jwst.jpg
 effect-vignette=0.2:0.2
