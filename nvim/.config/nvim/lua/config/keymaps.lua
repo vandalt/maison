@@ -28,6 +28,11 @@ vim.keymap.set("n", "<leader>0", "^", { remap = true })
 
 vim.keymap.set("n", "<leader>cw", "<Cmd>%s/\\s\\+$//e|norm!``<CR>", { desc = "Clear trailing spaces" })
 
+vim.keymap.set("n", "<leader><CR><CR>", "o# %%<CR><C-w>")
+vim.keymap.set("n", "<leader><CR>m", "o<CR># %% [markdown]<CR><C-w>")
+vim.keymap.set("i", "<A-Enter>", "<CR><CR># %%<CR><C-w>")
+vim.keymap.set("i", "<A-m>", "<CR><CR># %% [markdown]<CR><C-w>")
+
 local function cppath()
   local path = vim.fn.expand("%:p")
   vim.fn.setreg("+", path)

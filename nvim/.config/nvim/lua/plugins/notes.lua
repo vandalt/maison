@@ -1,26 +1,28 @@
 local zk_start_week = "sunday"
+local meeting_day = "thursday"
 
 local function create_reading_tbl()
-	local author = vim.fn.input("Author: ")
-	local year = vim.fn.input("Year: ")
-	local readingid = vim.fn.input("Reading ID: ")
+  local author = vim.fn.input("Author: ")
+  local year = vim.fn.input("Year: ")
+  local readingid = vim.fn.input("Reading ID: ")
 
-	local title = table.concat({ author, year, readingid }, " ")
+  local title = table.concat({ author, year, readingid }, " ")
 
-	local zk_tbl = { title = title, dir = "readings", extra = { author = author, year = year, readingid = readingid } }
-	-- local reading_str = vim.inspect(zk_tbl, {newline = " ", indent=""})
-	-- return reading_str
-	return zk_tbl
+  local zk_tbl = { title = title, dir = "readings", extra = { author = author, year = year, readingid = readingid } }
+  -- local reading_str = vim.inspect(zk_tbl, {newline = " ", indent=""})
+  -- return reading_str
+  return zk_tbl
 end
 
 local function get_date_zw(start_week_day)
   start_week_day = start_week_day or "sunday"
+  -- TODO: 'Start week day stays sunday, but day determining which week to use should be 
   ---@diagnostic disable-next-line: assign-type-mismatch
-	if string.lower(os.date("%A")) == start_week_day then
-		return "today"
-	else
-		return start_week_day
-	end
+  if string.lower(os.date("%A")) == start_week_day then
+    return "today"
+  else
+    return start_week_day
+  end
 end
 
 return {
@@ -34,7 +36,7 @@ return {
       }
     },
     keys = {
-      { "<leader>mp", "<Cmd>PasteImg<CR>", desc = "Paste image" },
+      { "<leader>mi", "<Cmd>PasteImg<CR>", desc = "Paste image" },
     },
   },
   {
@@ -80,7 +82,8 @@ return {
       { "<leader>zk", function() require("zk").new({ title = 'backlog' }) end, desc = "Go to backlog (zk)" },
       { "<leader>zn", ":'<,'>ZkNewFromTitleSelection { dir = vim.fn.input('Dir: ', '', 'dir') }<CR>", mode = {"x"}, desc = "New note from title selection" },
       { "<leader>zz", ":'<,'>ZkNewFromTitleSelection { dir = 'zettel' }<CR>", mode = {"x"}, desc = "New zettel from title selection" },
-      { "<leader>zo", "<Cmd>ZkNotes<CR>", desc = "Open note (zk)" },
+      { "<leader>zo", "<Cmd>ZkNotes { hrefs = { 'zettel', 'backlog.md', 'index.md' } }<CR>", desc = "Open zettel note (zk)" },
+      { "<leader>za", "<Cmd>ZkNotes<CR>", desc = "Open any note (zk)" },
       { "<leader>zi", "<Cmd>ZkIndex<CR>", desc = "Index notes (zk)"},
       { "<leader>zt", "<Cmd>ZkTags<CR>", desc = "Search tags (zk)" },
       { "<leader>zl", "<Cmd>ZkLinks<CR>", desc = "Search links (zk)" },
@@ -100,11 +103,11 @@ return {
         MkdnEnter = { "i", "<CR>" },
         MkdnFollowLink = { "n", "<CR>" },
         MkdnDecreaseHeading = { "n", "=" },
-        MkdnTableNewRowBelow = { "n", "<leader>ir" },
-        MkdnTableNewRowAbove = { "n", "<leader>iR" },
-        MkdnTableNewColAfter = { "n", "<leader>ic" },
+        MkdnTableNewRowBelow = { "n", "<leader>ib" },
+        MkdnTableNewRowAbove = { "n", "<leader>iB" },
+        MkdnTableNewColAfter = { "n", "<leader>ia" },
+        MkdnTableNewColBefore = { "n", "<leader>iA" },
         MkdnToggleToDo = {{'n', 'v'}, '<C-Space>'},
-        MkdnTableNewColBefore = { "n", "<leader>iC" },
         MkdnYankAnchorLink = { "n", "yal" },
       },
       links = {
@@ -125,5 +128,21 @@ return {
   {
     "iamcco/markdown-preview.nvim",
     build = function() vim.fn["mkdp#util#install"]() end,
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    init = function()
+      vim.cmd([[
+        function OpenMarkdownPreview (url)
+          execute "silent ! firefox --new-window " . a:url
+        endfunction
+      ]])
+
+      vim.g.mkdp_browserfunc = 'OpenMarkdownPreview'
+      vim.g.mkdp_auto_close = 0
+      vim.g.mkdp_combine_preview = 1
+    end,
+    keys = {
+      { "<leader>mp", "<Cmd>MarkdownPreviewToggle<CR>", desc = "Toggle Markdow Preview" },
+    },
   }
 }

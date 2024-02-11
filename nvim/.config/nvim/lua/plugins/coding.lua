@@ -31,6 +31,18 @@ return {
     },
   },
   {
+    "echasnovski/mini.splitjoin",
+    opts = {
+      mappings = {
+        toggle = "gS",
+      },
+      detect = {
+
+        brackets = { '%b()', '%b[]', '%b{}' },
+      },
+    },
+  },
+  {
     "L3MON4D3/LuaSnip",
     keys = function()
       return {}
@@ -44,17 +56,20 @@ return {
       -- If problems: https://github.com/kiyoon/jupynium.nvim#optionally-configure-nvim-cmp-to-show-jupyter-kernel-completion
       opts.sources = cmp.config.sources(vim.list_extend(opts.sources, {
         { name = "jupynium" },
+        { name = "otter" },
       }))
 
-      for i, source in ipairs(opts.sources) do
-        if source["name"] == "path" then
-          opts.sources[i]["option"] = {
-            get_cwd = function()
-              return vim.fn.getcwd()
-            end,
-          }
-        end
-      end
+      -- TODO: Make this dependent on filetype or path. Pretty much only want this for 
+      -- IPython files
+      -- for i, source in ipairs(opts.sources) do
+      --   if source["name"] == "path" then
+      --     opts.sources[i]["option"] = {
+      --       get_cwd = function()
+      --         return vim.fn.getcwd()
+      --       end,
+      --     }
+      --   end
+      -- end
 
       local has_words_before = function()
         unpack = unpack or table.unpack
@@ -126,12 +141,39 @@ return {
         end,
         desc = "Generate Numpydoc annotation with Neogen",
       },
+      {
+        "<leader>ng",
+        function()
+          require("neogen").generate({ annotation_convention = { python = "google_docstrings" } })
+        end,
+        desc = "Generate Google docstrings annotation with Neogen",
+      },
     },
   },
   {
     "echasnovski/mini.ai",
     opts = {
       n_lines = 1000,
-    }
+    },
   },
+  {
+    "kmonad/kmonad-vim",
+  },
+  { "Glench/Vim-Jinja2-Syntax" },
+  {
+    "mfussenegger/nvim-dap-python",
+    keys = {
+      { "<leader>dPt", function() require('dap-python').test_method({config = {justMyCode = false}}) end, desc = "Debug Method", ft = "python" },
+      { "<leader>dPc", function() require('dap-python').test_class({config = {justMyCode = false}}) end, desc = "Debug Class", ft = "python" },
+    },
+    config = function()
+      require('dap-python').test_runner = 'pytest'
+      local path = require("mason-registry").get_package("debugpy"):get_install_path()
+      require("dap-python").setup(path .. "/venv/bin/python", {include_configs = false})
+      local configurations = require('dap').configurations.python
+      for _, configuration in pairs(configurations) do
+        configuration.justMyCode = false
+      end
+    end
+  }
 }

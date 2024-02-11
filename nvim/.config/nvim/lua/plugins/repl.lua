@@ -8,16 +8,29 @@
 
 local function openSlimeTerm()
   local id = vim.fn.system("kitty @ launch --type=os-window --cwd=current")
-  vim.b.slime_config = { window_id = id, listen_on = "" }
+  local new_config = { window_id = id, listen_on = "" }
+  -- Make sure buffer from where new terminal is created gets updated
+  vim.b.slime_config = new_config
+  -- New buffes will use latest terminal by default
+  vim.g.slime_default_config = new_config
 end
 
-local function openREPL()
+local function updateSlimeDefaultConfig()
+  vim.b.slime_config = vim.g.slime_default_config
+end
+
+local function openPythonREPL()
   openSlimeTerm()
   -- TODO: Check for venv otherwise do nothing
-  vim.fn.system("kitty @ send-text 'pact; ipython'\\\\x0D")
-  vim.fn.system("hyprctl dispatch focuscurrentorlast")
+  vim.fn.system("kitty @ send-text 'pact; cd notebooks; ipython'\\\\x0D")
+  -- vim.fn.system("hyprctl dispatch focuscurrentorlast")
 end
 
+local function openJuliaREPL()
+  openSlimeTerm()
+  vim.fn.system("kitty @ send-text 'julia'\\\\x0D")
+  -- vim.fn.system("hyprctl dispatch focuscurrentorlast")
+end
 return {
   {
     "kiyoon/jupynium.nvim",
@@ -29,6 +42,7 @@ return {
       firefox_profile_name = "selprofile",
       jupynium_file_pattern = { "*.ju.*", "*.ipynb", ".py" },
     },
+    enabled = true,
     lazy = false,
     keys = {
       -- Execution keybindings
@@ -81,7 +95,7 @@ return {
         "<space>jh",
         "<cmd>lua require'jupynium.textobj'.goto_current_cell_separator()<cr>",
         mode = { "n", "x", "o" },
-        desc = "Go to current Jupynium cell",
+        desc = "Go to current Jupyniu cell",
       },
       {
         "aj",
@@ -115,19 +129,141 @@ return {
     "jpalardy/vim-slime",
     init = function()
       vim.g.slime_target = "kitty"
+      vim.g.slime_dont_ask_default = 1
       vim.g.slime_no_mappings = 1
       vim.g.slime_cell_delimiter = "# %%"
-      vim.g.slime_python_ipython = 1
+      -- TODO: For markdown
+      -- vim.g.slime_cell_delimiter = "```"
+      -- vim.g.slime_python_ipython = 1
+      vim.g.slime_bracketed_paste = 1
       vim.keymap.set("n", "<leader>it", openSlimeTerm, { desc = "Open terminal for Slime" })
-      vim.keymap.set("n", "<leader>ir", openREPL, { desc = "Open IPython REPL" })
+      vim.keymap.set("n", "<leader>ir", openPythonREPL, { desc = "Open IPython REPL" })
+      vim.keymap.set("n", "<leader>ij", openJuliaREPL, { desc = "Open Julia REPL" })
+      vim.keymap.set("n", "<leader>iu", updateSlimeDefaultConfig, { desc = "Update slime config to latest default" })
       vim.keymap.set("n", "<leader>il", "<Plug>SlimeLineSend", { desc = "Send line to REPL" })
-      vim.keymap.set("n", "<leader>is", "<Plug>SlimeMotionSend", {desc = "Send motion to REPL" })
-      vim.keymap.set("x", "<leader>is", "<Plug>SlimeRegionSend", {desc = "Send selection to REPL" })
-      vim.keymap.set("n", "<leader>ib", "<Plug>SlimeParagraphSend", {desc = "Send paragraph (block) to REPL" })
-      vim.keymap.set("n", "<leader>ii", "<leader>isajj]j", {remap = true, desc = "Send cell to REPL and go to the next" })
-      vim.keymap.set("n", "<leader>ih", "<Plug>SlimeSendCell", {desc = "Send cell to REPL" })
+      vim.keymap.set("n", "<leader>is", "<Plug>SlimeMotionSend", { desc = "Send motion to REPL" })
+      vim.keymap.set("x", "<leader>is", "<Plug>SlimeRegionSend", { desc = "Send selection to REPL" })
+      vim.keymap.set("n", "<leader>ib", "<Plug>SlimeParagraphSend", { desc = "Send paragraph (block) to REPL" })
+      vim.keymap.set(
+        "n",
+        "<leader>ii",
+        "<leader>isajj]j",
+        { remap = true, desc = "Send cell to REPL and go to the next" }
+      )
+      vim.keymap.set(
+        "n",
+        "<leader>ic",
+        "<leader>isio",
+        { remap = true, desc = "Send markdown code cell to REPL" }
+      )
+      vim.keymap.set("n", "<leader>ih", "<Plug>SlimeSendCell", { desc = "Send cell to REPL" })
     end,
   },
+  {
+    "goerz/jupytext.vim",
+    init = function()
+      vim.g.jupytext_fmt = "py:percent"
+    end,
+  },
+  -- {
+  --   "benlubas/molten-nvim",
+  --   build = ":UpdateRemotePlugins",
+  --   init = function()
+  --     vim.g.molten_image_provider = "image.nvim"
+  --     vim.g.molten_output_win_max_height = 12
+  --   end,
+  -- },
+  {
+    "benlubas/molten-nvim",
+    dependencies = { "3rd/image.nvim" },
+    build = ":UpdateRemotePlugins",
+    init = function()
+      -- these are examples, not defaults. Please see the readme
+      vim.g.molten_image_provider = "image.nvim"
+      vim.g.molten_output_win_max_height = 20
+      -- Probably a good idea to set a binding for `:noautocmd MoltenEnterOutput`
+      vim.g.molten_auto_open_output = false
+      -- Optional, nice for virtual text
+      vim.g.molten_wrap_output = true
+      -- Virtual text output
+      vim.g.molten_virt_text_output = true
+      -- Make output show up after ``` s.t. can add text to cell
+      vim.g.molten_virt_lines_off_by_1 = true
+    end,
+    keys = {
+      {"<leader>ro", "<cmd>MoltenEvaluateOperator<CR>", desc = "Molten evaluate operator"},
+      {"<leader>rs", "<cmd>noautocmd MoltenEnterOutput<CR>", desc = "Molten enter output"},
+      {"<leader>rr", "<cmd>MoltenReevaluateCell<CR>", desc = "Molten re-evaluate cell"},
+      {"<leader>rv", "<cmd><C-u>MoltenEvaluateVisual<CR>gv", mode = {"v"}, desc = "Molten execute visual selection"},
+      {"<leader>rh", "<cmd>MoltenHideOutput<CR>", desc = "Molten close output window"},
+      {"<leader>rh", "<cmd>MoltenDelete<CR>", desc = "Molten delete cell"},
+    }
+  },
+  {
+    "quarto-dev/quarto-nvim",
+    dependencies = {
+      "jmbuhr/otter.nvim",
+      "benlubas/molten-nvim",
+      "hrsh7th/nvim-cmp",
+      "neovim/nvim-lspconfig",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    opts = {
+      lspFeatures = {
+        languages = { "python" },
+        chunks = "all",
+        diagnostics = {
+          enabled = true,
+          triggers = { "BufWritePost" },
+        },
+        completion = { enabled = true },
+      },
+      -- keymap = { hover = "<leader>rk" },
+      -- TODO: Maybe set keymap config
+      codeRunner = {
+        enabled = true,
+        default_method = "molten",
+      },
+    },
+    ft = { "quarto", "markdown" },
+    keys = {
+      { "<leader>rc", function() require("quarto.runner").run_cell() end, desc = "Run Quarto cell"},
+      { "<leader>ra", function() require("quarto.runner").run_above() end, desc = "Run Quarto cell and above"},
+      { "<leader>rA", function() require("quarto.runner").run_all() end, desc = "Run all Quarto cells"},
+      { "<leader>rl", function() require("quarto.runner").run_line() end, desc = "Run Quarto line"},
+      { "<leader>r", function() require("quarto.runner").run_range() end, mode = {"v"}, desc = "Run Quarto visual range"},
+      -- { "<leader>rk", function() require("otter").ask_hover() end, desc = "Quarto hover", silent = false},
+      -- { "<C-K>", function() require("otter").ask_hover() end, mode = {"i"}, desc = "Quarto hover"},
+    }
+  },
+  {
+    "jmbuhr/otter.nvim",
+    opts = {
+      buffers = {
+        set_filetype = true,
+      }
+    }
+  },
+  -- {
+  --   "chrisgrieser/nvim-various-textobjs",
+  --   -- lazy = true,
+  --   keys = {
+  --     {
+  --       "ic",
+  --       "<cmd>lua require('various-textobjs').mdFencedCodeBclock('inner')<CR>",
+  --       { "o", "x" },
+  --       desc = "Select inner md code block",
+  --       buffer = true
+  --     },
+  --     {
+  --       "ac",
+  --       "<cmd>lua require('various-textobjs').mdFencedCodeBlock('outer')<CR>",
+  --       { "o", "x" },
+  --       desc = "Select outer md code block",
+  --       buffer = true
+  --     },
+  --   },
+  -- },
   -- {
   --   'luk400/vim-jukit',
   --   init = function()
