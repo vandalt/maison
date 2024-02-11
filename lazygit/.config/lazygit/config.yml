@@ -1,0 +1,7 @@
+os:
+  # edit: nvim --server $NVIM --remote-tab {{filename}}
+  editPreset: "nvim"
+  edit: 'nvim --server $NVIM --remote {{filename}}'
+  editAtLine: 'nvim --server $NVIM --remote --line={{line}} {{filename}}'
+  editAtLineAndWait: 'myeditor --server $NVIM --remot --block --line={{line}} {{filename}}'
+  editInTerminal: true
