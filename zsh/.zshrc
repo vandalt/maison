@@ -17,6 +17,15 @@ if ! [[ "$PATH" =~ "$HOME/go/bin" ]]
 then
   PATH="$HOME/go/bin:$PATH"
 fi
+if ! [[ "$PATH" =~ "$HOME/.local/share/nvim/distant.nvim/bin" ]]
+then
+  PATH="$HOME/.local/share/nvim/distant.nvim/bin:$PATH"
+fi
+if ! [[ "$LD_LIBRARY_PATH" =~ "$HOME/repos/astro/MultiNest/lib" ]]
+then
+  LD_LIBRARY_PATH="$HOME/repos/astro/MultiNest/lib:$LD_LIBRARY_PATH"
+fi
+export LD_LIBRARY_PATH
 
 # Put extra completions in zfunc
 fpath+=~/.zfunc
@@ -76,6 +85,7 @@ alias ltr='ls -ltr'
 alias treei='tree --gitignore'
 alias rmr='rm -rI'
 alias dh='du -sch *'
+alias dhsh='du -sch * | sort -h'
 alias dha='du -d 1 -h .'
 alias untar='tar -xvf'
 alias guntar='tar -xzvf'
@@ -89,6 +99,9 @@ alias scls="screen -ls"
 alias mutt='neomutt'
 alias muttr='neomutt -R'
 
+# Tw
+alias t='task'
+
 # Editor
 export EDITOR='nvim'
 
@@ -100,6 +113,11 @@ alias dndoff='makoctl mode -s default'
 # Quick access to config files
 alias cnvim='z ~/.config/nvim; nvim init.lua; z -'
 alias cs='nvim ~/.config/sway/config'
+alias cruff='nvim ~/repos/ruff.toml'
+
+# TUI things
+alias pmix='pulsemixer'
+alias blue='bluetuith'
 
 # alias jwst-apt='~/programs/APT/APT'
 
@@ -107,14 +125,16 @@ setopt +o nomatch
 alias tclean='rm *.aux *.fls *.fdb_latexmk *.log *.out *.vrb *.nav *.snm *.synctex.* *.toc *.bbl *.blg *.lof'
 
 export THEANO_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
+export AESARA_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
+export PYTENSOR_FLAGS=blas__ldflags="-L/usr/lib/ -lopenblas"
 # export XLA_FLAGS="--xla_force_host_platform_device_count=4"
-# export MKL_DYNAMIC=FALSE
-# export MKL_CBWR=COMPATIBLE
-# export OMP_NUM_THREADS=1
-# export OPENBLAS_NUM_THREADS=1
-# export MKL_NUM_THREADS=1
-# export VECLIB_MAXIMUM_THREADS=1
-# export NUMEXPR_NUM_THREADS=1
+export MKL_DYNAMIC=FALSE
+export MKL_CBWR=COMPATIBLE
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
 export XLA_FLAGS="--xla_force_host_platform_device_count=8 --xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1"
 export WEBBPSF_PATH=$HOME/Documents/data/package-data/webbpsf-data
 export PYSYN_CDBS=$HOME/Documents/data/package-data/trds
@@ -152,20 +172,9 @@ if [ $TERM = "alacritty" ]; then
 fi
 
 setopt CORRECT_ALL
+export CORRECT_IGNORE_FILE="go|.config"
 
 
-# mkdir and cd at once
-function mkcd() {
-  mkdir -p "$1" && cd "$1";
-}
-# Same but with z/zoxide/whatever autojump util
-function mkz() {
-  mkdir -p "$1" && z "$1";
-}
-# View csv with less and column tools
-function csview {
-  column -s, -t "$@" | less -N -S
-}
 # Go to notes and open nvim
 export ZK_NOTEBOOK_DIR="/home/vandal/notes"
 function znv() {
@@ -179,10 +188,11 @@ function znv() {
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-JWST_TOKEN_FILE=~/repos/astro/jwst-manage-data/latest_token.txt
+JWST_TOKEN_FILE=~/.local/share/mast/latest_token.txt
 if [[ -f "$JWST_TOKEN_FILE" ]]; then
   export MAST_API_TOKEN="$(cat $JWST_TOKEN_FILE)"
 fi
+export JWSTDOWNLOAD_OUTDIR=~/Documents/data/jwst-obs
 
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init --path)"
@@ -195,11 +205,65 @@ fi
 
 alias luamake=/home/vandal/programs/lua-language-server/3rd/luamake/luamake
 
+# nnn configuration
+# A: Don't auto switch when searching
+export NNN_OPTS="aA"
+# Use trash-cli
+export NNN_TRASH=1
+# Plugins
+export NNN_PLUG="z:autojump;d:dragdrop;g:getplugs;x:xdgdefault;p:preview-tui"
+# export NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
+n ()
+{
+    # Block nesting of nnn in subshells
+    [ "${NNNLVL:-0}" -eq 0 ] || {
+        echo "nnn is already running"
+        return
+    }
+
+    # The behaviour is set to cd on quit (nnn checks if NNN_TMPFILE is set)
+    # If NNN_TMPFILE is set to a custom path, it must be exported for nnn to
+    # see. To cd on quit only on ^G, remove the "export" and make sure not to
+    # use a custom path, i.e. set NNN_TMPFILE *exactly* as follows:
+    #      NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
+    export NNN_TMPFILE="${XDG_CONFIG_HOME:-$HOME/.config}/nnn/.lastd"
+
+    # Unmask ^Q (, ^V etc.) (if required, see `stty -a`) to Quit nnn
+    # stty start undef
+    # stty stop undef
+    # stty lwrap undef
+    # stty lnext undef
+
+    # The command builtin allows one to alias nnn to n, if desired, without
+    # making an infinitely recursive alias
+    command nnn "$@"
+
+    [ ! -f "$NNN_TMPFILE" ] || {
+        . "$NNN_TMPFILE"
+        rm -f "$NNN_TMPFILE" > /dev/null
+    }
+}
+
 # Conda init stuff slows down shell. Load only when used (not my main Python)
 # Tiny delay from conda init would be OK if used conda/mamba as main Python.
-alias mambaload="eval \"\$(/home/vandal/mambaforge/bin/conda shell.zsh hook)\""
+alias miniload="eval \"\$(/home/vandal/miniforge3/bin/conda shell.zsh hook)\""
 
 # Enable intel oneapi compilers (not python)
 alias isource="source /opt/intel/oneapi/setvars.sh --config=\"/home/vandal/.zsh/intel_oneapi_config.txt\""
 
 alias apero_source_setup="source /home/vandal/apero/default/apero/apero.zsh.setup"
+alias apero_online_he="source /home/vandal/apero/default/nirps_online_he/nirps_online_he.zsh.setup"
+
+# NOTE: Keep at bottom to make sure "z" command has been defined.
+# mkdir and cd at once
+function mkcd() {
+  mkdir -p "$1" && cd "$1";
+}
+# Same but with z/zoxide/whatever autojump util
+function mkz() {
+  mkdir -p "$1" && z "$1";
+}
+# View csv with less and column tools
+function csview {
+  column -s, -t "$@" | less -N -S
+}
