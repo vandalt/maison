@@ -5,5 +5,5 @@ Name=NordVPN
 Comment=The best online VPN service for speed and security.
 Icon=nordvpn
 MimeType=x-scheme-handler/nordvpn
-Exec=kitty -- nordvpn login --callback %u
+Exec=kitty --class NordVPN -- nordvpn click %u
 Terminal=false
