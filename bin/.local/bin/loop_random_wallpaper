@@ -1,0 +1,30 @@
+#!/usr/bin/bash
+
+if [[ $# -lt 1 ]] || [[ ! -d $1   ]]; then
+  echo "Usage:
+  $0 <dir containing images>"
+  exit 1
+fi
+
+INTERVAL=600
+
+if ! type "fd" > /dev/null 2>&1; then
+  echo "ERROR: 'fd' command doesn't exist!"
+  exit 1
+fi
+
+# Repeat the whole loop forever
+while true; do
+  # TODO: Get outputs with swww query and update wallpaper
+  # for all separately by looping? Could be in a wrapper script so can do it
+  # manually too
+  fd -t f . $1 \
+    | while read -r img; do
+      echo "$((RANDOM % 1000)):$img"
+    done \
+    | sort -n | cut -d':' -f2- \
+    | while read -r img; do
+      swww img "$img" -t none
+      sleep $INTERVAL
+    done
+done
