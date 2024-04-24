@@ -28,7 +28,7 @@ pydefaults() {
       ipystr="ipython<=8.12"
     fi
   fi
-  python -m pip install -U "$ipystr" ipdb ipykernel pyqt5 flake8 flake8-bugbear isort black jupytext copier
+  python -m pip install -U "$ipystr" ipdb ipykernel pyqt6 flake8 flake8-bugbear isort black jupytext copier
 }
 
 addipy() {
