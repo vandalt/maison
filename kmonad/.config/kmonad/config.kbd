@@ -26,15 +26,20 @@
   lctl lmet lalt           spc            ralt rctl lft up down rght
 )
 
+;; NOTE: Tapping term is the number for each alias
 (defalias
-  zth (tap-hold-next-release 150 z lctl)
-  /th (tap-hold-next-release 150 / rctl)
-  escth (tap-hold-next-release 150 esc lsft)
-  ath (tap-hold-next-release 150 a lctl)
-  sth (tap-hold-next-release 150 s lalt)
-  quoth (tap-hold-next-release 150 ' rsft)
-  colth (tap-hold-next-release 150 ; rctl)
-  lth (tap-hold-next-release 150 l ralt)
+  zth (tap-hold-next-release 135 z lctl)
+  /th (tap-hold-next-release 135 / rctl)
+  escth (tap-hold-next-release 135 esc ralt)
+  ath (tap-hold-next-release 135 a lmet)
+  sth (tap-hold-next-release 135 s lalt)
+  dth (tap-hold-next-release 135 d lctl)
+  fth (tap-hold-next-release 135 f lsft)
+  quoth (tap-hold-next-release 135 ' ralt)
+  colth (tap-hold-next-release 135 ; rmet)
+  lth (tap-hold-next-release 135 l lalt)
+  kth (tap-hold-next-release 135 k rctl)
+  jth (tap-hold-next-release 135 j rsft)
   sym (layer-toggle symbols)
 )
 
@@ -42,10 +47,10 @@
   caps  f1   f2   f3  f4  f5  f6  f7  f8  f9  f10  f11  f12  prnt ins  del
   grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
   tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-  @escth @ath    @sth    d    f    g    h    j    k    @lth    @colth    @quoth    ret
-  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  @escth @ath    @sth    @dth    @fth    g    h    @jth    @kth    @lth    @colth    @quoth    ret
+  @sym z    x    c    v    b    n    m    ,    .    /    @sym
   ;; NOTE: Fn cannot be remapped so not there
-  @sym lalt lmet           spc            ralt @sym lft up down rght
+  @sym caps bspc           spc            ret @sym lft up down rght
 )
 
 (deflayer symbols
