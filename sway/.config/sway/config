@@ -382,7 +382,12 @@ for_window [app_id="com.gitlab.newsflash"] floating enable
 for_window [app_id="org.gnome.Calendar"] floating enable
 for_window [app_id="org.gnome.baobab"] floating enable
 
+
+# Assign to workspace
+assign [app_id="Slack"] workspace number 9
+assign [title="Spotify Premium"] workspace number 10
+
 # Transparent windows!
-for_window [title = "Spotify Premium"] opacity 0.9
+for_window [title="Spotify Premium"] opacity 0.9
 
 include /etc/sway/config.d/*

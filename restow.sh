@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
-stow -vRt ~ nvim
-stow --no-folding -vRt ~ bin bash zsh sway waybar swaylock kanshi mako kmonad rofi libinput-gestures gammastep kitty lazygit neomutt urlview systemd ipython matplotlib qutebrowser tridactyl
+stow --dotfiles -vRt ~ nvim
+stow --dotfiles --no-folding -vRt ~ bin bash zsh sway waybar swaylock kanshi mako kmonad rofi libinput-gestures gammastep kitty lazygit neomutt urlview systemd ipython matplotlib qutebrowser tridactyl
 
 cd garage || exit
 
