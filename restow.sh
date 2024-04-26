@@ -6,6 +6,6 @@ stow --dotfiles --no-folding -vRt ~ bin bash zsh sway waybar swaylock kanshi mak
 cd garage || exit
 
 # stow -vRt ~ git onedrive neomutt bin vandalfiles
-stow --no-folding -vRt ~ git bin vandalfiles neomutt pim onedrive paru taskwarrior 
+stow --dotfiles --no-folding -vRt ~ git bin vandalfiles neomutt pim onedrive paru taskwarrior 
 
 cd ..
