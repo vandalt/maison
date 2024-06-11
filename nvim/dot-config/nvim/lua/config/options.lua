@@ -14,7 +14,7 @@ if not vim.env.SSH_TTY then
   opt.clipboard = "unnamedplus" -- Sync with system clipboard
 end
 opt.formatoptions = "jcroqlnt" -- tcqj
-opt.spelllang = { "en" }
+opt.spelllang = { "en", "fr" }
 opt.wildmode = "longest:full,full" -- Command-line completion mode
 -- :h shortmess to see what each letter means (I is intro message)
 opt.shortmess:append({ W = true, I = true, c = true, C = true })

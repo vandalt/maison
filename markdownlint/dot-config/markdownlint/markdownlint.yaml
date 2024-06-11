@@ -1,0 +1,4 @@
+# MD012/no-multiple-blanks
+MD012:
+  # Two blank lines is nice above some headings
+  maximum: 2
